@@ -1,0 +1,57 @@
+services:
+
+  nvun:
+    build:
+      context: ./docker/nvun
+    container_name: nouveau-vision-nvun
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'nvu-cli -datadir=/home/nvu/.nvu getblockchaininfo 2>/dev/null | grep -q "\"initialblockdownload\": false"'
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+    volumes:
+      - nvu-data:/home/nvu/.nvu
+      - nvu-credentials:/home/nvu/credentials
+
+    ports:
+      - "9333:9333"
+
+    networks:
+      nvu-network:
+        aliases:
+          - nvun
+
+  asicseer:
+    build:
+      context: ./docker/asicseer
+    container_name: nouveau-vision-asicseer
+    restart: unless-stopped
+
+    depends_on:
+      nvun:
+        condition: service_healthy
+
+    volumes:
+      - nvu-credentials:/home/ubuntu/credentials:ro
+      - asicseer-logs:/var/log/asicseer
+
+    ports:
+      - "3336:3335"
+
+    networks:
+      - nvu-network
+
+volumes:
+  nvu-data:
+  nvu-credentials:
+  asicseer-logs:
+
+networks:
+  nvu-network:
+    driver: bridge

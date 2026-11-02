@@ -1,0 +1,14 @@
+# macOS junk
+.DS_Store
+
+# Local NVU working/test configuration
+nouveau-vision-nvu/config/
+
+# Local development backups
+nouveau-vision-nvu/*.before-*
+nouveau-vision-nvu/*.before-cleanup
+
+# Editor/temp files
+*~
+*.swp
+*.tmp
