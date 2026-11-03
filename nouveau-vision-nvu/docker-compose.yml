@@ -1,8 +1,7 @@
 services:
 
   nvun:
-    build:
-      context: ./docker/nvun
+    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:0.1.1
     container_name: nouveau-vision-nvun
     restart: unless-stopped
 
@@ -28,8 +27,7 @@ services:
           - nvun
 
   asicseer:
-    build:
-      context: ./docker/asicseer
+    image: ghcr.io/thenouveauvision/nouveau-vision-asicseer:0.1.1
     container_name: nouveau-vision-asicseer
     restart: unless-stopped
 
