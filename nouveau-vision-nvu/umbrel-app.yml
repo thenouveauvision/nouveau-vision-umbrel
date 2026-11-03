@@ -2,7 +2,7 @@ manifestVersion: 1
 id: nouveau-vision-nvu
 name: Nouveau-Vision NVU
 tagline: Run an NVU full node and solo mining pool on Umbrel
-icon: https://nvu.us/umbrel/icon.svg
+icon: https://nvu.us/nvu-umbrel-app-icon.png
 category: bitcoin
 version: "0.1.0"
 port: 3336
