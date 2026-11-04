@@ -73,5 +73,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-dashboard:0.2.0
+            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-dashboard:0.2.1
             ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-dashboard:latest

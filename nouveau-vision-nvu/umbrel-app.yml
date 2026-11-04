@@ -4,8 +4,8 @@ name: Nouveau-Vision NVU
 tagline: Run an NVU full node and solo mining pool on Umbrel
 icon: https://nvu.us/nvu-umbrel-app-icon.png
 category: bitcoin
-version: "0.2.0"
-port: 3336
+version: "0.2.1"
+port: 3340
 
 description: >-
   Run a Nouveau-Vision Unit full node and ASICseer solo mining pool
@@ -22,10 +22,10 @@ support: https://nvu.us
 gallery: []
 
 releaseNotes: >-
-  Corrects Umbrel installation by using published NVUN and ASICseer
-  container images. Includes NVUN full-node support, peer discovery,
-  persistent blockchain data, dynamically generated RPC credentials,
-  and ASICseer solo mining support.
+  Fixes the Umbrel launcher so the NVU Dashboard opens on its dedicated
+  HTTP port while ASICseer Stratum remains on TCP port 3336. Updates
+  mining difficulty formatting to use K/M/G/T notation and includes
+  the latest NVU Dashboard improvements.
 
 dependencies: []
 path: ""
