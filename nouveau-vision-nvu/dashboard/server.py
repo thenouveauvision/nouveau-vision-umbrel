@@ -531,7 +531,7 @@ def search():
 def version():
     return jsonify({
         "ok": True,
-        "dashboardVersion": "0.2.1",
+        "dashboardVersion": "0.2.2",
         "project": "Nouveau-Vision Unit",
         "ticker": "NVU",
     })

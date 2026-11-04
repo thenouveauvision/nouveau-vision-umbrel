@@ -1372,3 +1372,41 @@ input:focus-visible {
   }
 
 }
+
+
+/* ---------------------------------------------------------
+   OVERVIEW NETWORK METRICS
+--------------------------------------------------------- */
+
+.overview-primary-grid,
+.overview-status-grid,
+.overview-network-grid {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+}
+
+.overview-network-grid {
+  margin-bottom: 14px;
+}
+
+.overview-network-grid .metric-card {
+  min-height: 132px;
+}
+
+.overview-network-grid .metric-value {
+  font-size: clamp(
+    1.65rem,
+    3vw,
+    2.35rem
+  );
+}
+
+@media (max-width: 600px) {
+
+  .overview-primary-grid,
+  .overview-status-grid,
+  .overview-network-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
