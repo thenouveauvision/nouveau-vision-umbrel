@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "nouveau-vision-nvu/docker/**"
+      - "nouveau-vision-nvu/dashboard/**"
       - ".github/workflows/publish-images.yml"
 
   workflow_dispatch:
@@ -15,11 +16,14 @@ permissions:
   packages: write
 
 jobs:
+
   publish:
+
     name: Build and publish NVU images
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -47,7 +51,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-nvun:0.1.1
+            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-nvun:0.2.0
             ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-nvun:latest
 
       - name: Build and publish ASICseer
@@ -58,5 +62,16 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-asicseer:0.1.1
+            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-asicseer:0.2.0
             ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-asicseer:latest
+
+      - name: Build and publish Dashboard
+        uses: docker/build-push-action@v6
+        with:
+          context: ./nouveau-vision-nvu/dashboard
+          file: ./nouveau-vision-nvu/dashboard/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-dashboard:0.2.0
+            ghcr.io/${{ steps.owner.outputs.name }}/nouveau-vision-dashboard:latest

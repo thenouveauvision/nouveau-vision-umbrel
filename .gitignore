@@ -12,3 +12,7 @@ nouveau-vision-nvu/*.before-cleanup
 *~
 *.swp
 *.tmp
+
+# Python generated files
+__pycache__/
+*.pyc

@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#060b14">
+
+  <title>Nouveau-Vision NVU</title>
+
+  <link rel="icon" href="/static/nvu-favicon.ico" sizes="64x64">
+
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <header class="topbar">
+
+      <div class="brand">
+        <img
+          class="brand-icon"
+          src="/static/nvu-umbrel-app-icon.png"
+          alt="Nouveau-Vision Unit"
+        >
+
+        <div class="brand-copy">
+          <h1>Nouveau-Vision Unit</h1>
+          <p>NVU Node, Mining &amp; Network Dashboard</p>
+        </div>
+      </div>
+
+      <div class="network-summary">
+
+        <div class="summary-item">
+          <span class="status-dot" id="network-dot"></span>
+
+          <div>
+            <span class="summary-label">Network</span>
+            <strong id="network-status">Connecting...</strong>
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-label">Block</span>
+          <strong id="header-height">--</strong>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-label">Peers</span>
+          <strong id="header-peers">--</strong>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-label">Mining</span>
+          <strong id="header-mining">--</strong>
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <nav class="navigation" aria-label="Dashboard sections">
+
+      <button
+        class="nav-button active"
+        type="button"
+        data-view="overview"
+      >
+        Overview
+      </button>
+
+      <button
+        class="nav-button"
+        type="button"
+        data-view="network"
+      >
+        Network
+      </button>
+
+      <button
+        class="nav-button"
+        type="button"
+        data-view="mining"
+      >
+        Mining
+      </button>
+
+      <button
+        class="nav-button"
+        type="button"
+        data-view="explorer"
+      >
+        Explorer
+      </button>
+
+      <button
+        class="nav-button"
+        type="button"
+        data-view="about"
+      >
+        About
+      </button>
+
+    </nav>
+
+
+    <main>
+
+      <!-- OVERVIEW -->
+
+      <section
+        class="view active"
+        id="view-overview"
+      >
+
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">NVU NETWORK</p>
+            <h2>Network Overview</h2>
+          </div>
+
+          <div
+            class="last-updated"
+            id="last-updated"
+          >
+            Waiting for node data...
+          </div>
+        </div>
+
+
+        <div class="metric-grid overview-primary-grid">
+
+          <article class="metric-card">
+            <span class="metric-label">NVUN Node</span>
+            <strong
+              class="metric-value"
+              id="overview-node-status"
+            >
+              Connecting...
+            </strong>
+            <span
+              class="metric-detail"
+              id="overview-version"
+            >
+              --
+            </span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Block Height</span>
+            <strong
+              class="metric-value accent"
+              id="overview-height"
+            >
+              --
+            </strong>
+            <span class="metric-detail">
+              Current NVU chain tip
+            </span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Network Difficulty</span>
+            <strong
+              class="metric-value accent"
+              id="overview-difficulty-card"
+            >
+              --
+            </strong>
+            <span class="metric-detail">
+              Current mining difficulty
+            </span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Network Hashrate</span>
+            <strong
+              class="metric-value accent"
+              id="overview-network-hashrate-card"
+            >
+              --
+            </strong>
+            <span class="metric-detail">
+              Estimated by NVUN
+            </span>
+          </article>
+
+        </div>
+
+
+        <div class="metric-grid overview-status-grid">
+
+          <article class="metric-card">
+            <span class="metric-label">Connected Peers</span>
+            <strong
+              class="metric-value"
+              id="overview-peers"
+            >
+              --
+            </strong>
+            <span
+              class="metric-detail"
+              id="overview-peer-detail"
+            >
+              --
+            </span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">ASICseer</span>
+            <strong
+              class="metric-value"
+              id="overview-pool-status"
+            >
+              --
+            </strong>
+            <span
+              class="metric-detail"
+              id="overview-solo-status"
+            >
+              Solo mining
+            </span>
+          </article>
+
+        </div>
+
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+          <article class="panel panel-wide">
+
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">BLOCKCHAIN</p>
+                <h3>Current Chain</h3>
+              </div>
+            </div>
+
+            <dl class="detail-list">
+
+              <div>
+                <dt>Best Block</dt>
+                <dd
+                  class="hash"
+                  id="overview-best-block"
+                >
+                  --
+                </dd>
+              </div>
+
+              <div>
+                <dt>Difficulty</dt>
+                <dd id="overview-difficulty">
+                  --
+                </dd>
+              </div>
+
+              <div>
+                <dt>Network Hashrate</dt>
+                <dd id="overview-network-hashrate">
+                  --
+                </dd>
+              </div>
+
+              <div>
+                <dt>Verification</dt>
+                <dd id="overview-verification">
+                  --
+                </dd>
+              </div>
+
+              <div>
+                <dt>Chainwork</dt>
+                <dd
+                  class="hash"
+                  id="overview-chainwork"
+                >
+                  --
+                </dd>
+              </div>
+
+            </dl>
+
+          </article>
+
+
+          <article class="panel">
+
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">SOLO MINING</p>
+                <h3>ASICseer Pool</h3>
+              </div>
+
+              <span
+                class="status-pill"
+                id="pool-status-pill"
+              >
+                Checking
+              </span>
+            </div>
+
+            <dl class="detail-list compact">
+
+              <div>
+                <dt>RPC</dt>
+                <dd id="pool-rpc-status">--</dd>
+              </div>
+
+              <div>
+                <dt>Generator</dt>
+                <dd id="pool-generator-status">--</dd>
+              </div>
+
+              <div>
+                <dt>Stratifier</dt>
+                <dd id="pool-stratifier-status">--</dd>
+              </div>
+
+              <div>
+                <dt>Workers</dt>
+                <dd id="pool-workers">--</dd>
+              </div>
+
+              <div>
+                <dt>Stratum</dt>
+                <dd id="pool-stratum">Port 3336</dd>
+              </div>
+
+            </dl>
+
+          </article>
+
+        </div>
+
+
+        <article class="panel">
+
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">BLOCKCHAIN</p>
+              <h3>Latest Blocks</h3>
+            </div>
+
+            <button
+              type="button"
+              class="text-button"
+              data-go-view="explorer"
+            >
+              Open Explorer
+            </button>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Height</th>
+                  <th>Block Hash</th>
+                  <th>Time</th>
+                  <th>Transactions</th>
+                  <th>Difficulty</th>
+                </tr>
+              </thead>
+
+              <tbody id="overview-blocks">
+                <tr>
+                  <td colspan="5">
+                    Loading blocks...
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+      </section>
+
+
+      <!-- NETWORK -->
+
+      <section
+        class="view"
+        id="view-network"
+      >
+
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">PEER-TO-PEER</p>
+            <h2>NVU Network</h2>
+          </div>
+        </div>
+
+
+        <div class="metric-grid">
+
+          <article class="metric-card">
+            <span class="metric-label">Total Peers</span>
+            <strong
+              class="metric-value"
+              id="network-peer-count"
+            >
+              --
+            </strong>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Inbound</span>
+            <strong
+              class="metric-value"
+              id="network-inbound"
+            >
+              --
+            </strong>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Outbound</span>
+            <strong
+              class="metric-value"
+              id="network-outbound"
+            >
+              --
+            </strong>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">P2P Port</span>
+            <strong class="metric-value">
+              9333
+            </strong>
+          </article>
+
+        </div>
+
+
+        <article class="panel">
+
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">LIVE PEERS</p>
+              <h3>Connected Nodes</h3>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Peer</th>
+                  <th>Direction</th>
+                  <th>Version</th>
+                  <th>Height</th>
+                  <th>Received</th>
+                  <th>Sent</th>
+                </tr>
+              </thead>
+
+              <tbody id="peer-table">
+                <tr>
+                  <td colspan="6">
+                    Loading peers...
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+      </section>
+
+
+      <!-- MINING -->
+
+      <section
+        class="view"
+        id="view-mining"
+      >
+
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">SHA-256 SOLO MINING</p>
+            <h2>ASICseer Mining</h2>
+          </div>
+        </div>
+
+
+        <div class="metric-grid">
+
+          <article class="metric-card">
+            <span class="metric-label">Pool</span>
+            <strong
+              class="metric-value"
+              id="mining-pool-status"
+            >
+              --
+            </strong>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Mode</span>
+            <strong class="metric-value accent">
+              SOLO
+            </strong>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Users</span>
+            <strong
+              class="metric-value"
+              id="mining-users"
+            >
+              --
+            </strong>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Workers</span>
+            <strong
+              class="metric-value"
+              id="mining-workers"
+            >
+              --
+            </strong>
+          </article>
+
+        </div>
+
+
+        <div class="mining-section-heading">
+          <p class="eyebrow">LIVE PERFORMANCE</p>
+          <h3>Pool Hashrate</h3>
+        </div>
+
+        <div class="metric-grid mining-metric-grid">
+
+          <article class="metric-card">
+            <span class="metric-label">1 Minute</span>
+            <strong class="metric-value accent" id="mining-hashrate-1m">--</strong>
+            <span class="metric-detail">Pool hashrate</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">5 Minutes</span>
+            <strong class="metric-value" id="mining-hashrate-5m">--</strong>
+            <span class="metric-detail">Pool hashrate</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">1 Hour</span>
+            <strong class="metric-value" id="mining-hashrate-1h">--</strong>
+            <span class="metric-detail">Pool hashrate</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">6 Hours</span>
+            <strong class="metric-value" id="mining-hashrate-6h">--</strong>
+            <span class="metric-detail">Pool hashrate</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Active Workers</span>
+            <strong class="metric-value" id="mining-active-workers">--</strong>
+            <span class="metric-detail" id="mining-configured-workers">-- configured</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Pool Difficulty</span>
+            <strong class="metric-value" id="mining-pool-difficulty">--</strong>
+            <span class="metric-detail">Current share difficulty</span>
+          </article>
+
+        </div>
+
+
+        <div class="mining-section-heading">
+          <p class="eyebrow">POOL PERFORMANCE</p>
+          <h3>Shares &amp; Mining History</h3>
+        </div>
+
+        <div class="metric-grid mining-metric-grid">
+
+          <article class="metric-card">
+            <span class="metric-label">Accepted Shares</span>
+            <strong class="metric-value accent" id="mining-accepted">--</strong>
+            <span class="metric-detail">ASICseer pool counter</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">ASICseer Rejected</span>
+            <strong class="metric-value" id="mining-rejected">--</strong>
+            <span class="metric-detail">Pool-side counter</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Best Share</span>
+            <strong class="metric-value mining-number" id="mining-best-share">--</strong>
+            <span class="metric-detail">Current pool session</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">All-Time Best</span>
+            <strong class="metric-value mining-number" id="mining-best-alltime">--</strong>
+            <span class="metric-detail">Highest recorded share</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Runtime</span>
+            <strong class="metric-value" id="mining-runtime">--</strong>
+            <span class="metric-detail">ASICseer uptime</span>
+          </article>
+
+          <article class="metric-card">
+            <span class="metric-label">Block Reward</span>
+            <strong class="metric-value accent" id="mining-reward">--</strong>
+            <span class="metric-detail">Solo block reward</span>
+          </article>
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+          <article class="panel">
+
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">CONNECTIONS</p>
+                <h3>Mining Endpoints</h3>
+              </div>
+            </div>
+
+            <dl class="detail-list">
+
+              <div>
+                <dt>Local Stratum</dt>
+                <dd id="mining-local-endpoint">
+                  This Umbrel :3336
+                </dd>
+              </div>
+
+              <div>
+                <dt>NVUN RPC</dt>
+                <dd id="mining-rpc-endpoint">
+                  nvun:9332
+                </dd>
+              </div>
+
+              <div>
+                <dt>NVUN P2P</dt>
+                <dd>
+                  TCP 9333
+                </dd>
+              </div>
+
+            </dl>
+
+          </article>
+
+
+          <article class="panel">
+
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">COMPONENTS</p>
+                <h3>ASICseer Services</h3>
+              </div>
+            </div>
+
+            <dl class="detail-list">
+
+              <div>
+                <dt>Connector</dt>
+                <dd id="mining-connector">--</dd>
+              </div>
+
+              <div>
+                <dt>Generator</dt>
+                <dd id="mining-generator">--</dd>
+              </div>
+
+              <div>
+                <dt>Stratifier</dt>
+                <dd id="mining-stratifier">--</dd>
+              </div>
+
+            </dl>
+
+          </article>
+
+        </div>
+
+
+        <article class="panel">
+
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">SOLO MINING HISTORY</p>
+              <h3>Blocks Found</h3>
+            </div>
+
+            <span
+              class="status-pill online"
+              id="blocks-found-count"
+            >
+              Loading
+            </span>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Height</th>
+                  <th>Worker</th>
+                  <th>Found</th>
+                  <th>Effort</th>
+                  <th>Shares</th>
+                  <th>Solve Diff</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="blocks-found-table">
+                <tr>
+                  <td colspan="7">
+                    Loading solved blocks...
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+
+        <article class="panel">
+
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">POOL ACTIVITY</p>
+              <h3>Recent ASICseer Events</h3>
+            </div>
+          </div>
+
+          <div
+            class="log-view"
+            id="mining-log"
+          >
+            Waiting for ASICseer activity...
+          </div>
+
+        </article>
+
+      </section>
+
+
+      <!-- EXPLORER -->
+
+      <section
+        class="view"
+        id="view-explorer"
+      >
+
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">NVU BLOCKCHAIN</p>
+            <h2>Block Explorer</h2>
+          </div>
+        </div>
+
+
+        <form
+          class="explorer-search"
+          id="explorer-search"
+        >
+
+          <label
+            class="sr-only"
+            for="explorer-query"
+          >
+            Search the NVU blockchain
+          </label>
+
+          <input
+            id="explorer-query"
+            name="q"
+            type="text"
+            autocomplete="off"
+            placeholder="Search block height, block hash, or transaction ID"
+          >
+
+          <button type="submit">
+            Search
+          </button>
+
+        </form>
+
+
+        <div
+          class="explorer-result"
+          id="explorer-result"
+          aria-live="polite"
+        ></div>
+
+
+        <article class="panel">
+
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">RECENT CHAIN</p>
+              <h3>Latest Blocks</h3>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Height</th>
+                  <th>Hash</th>
+                  <th>Time</th>
+                  <th>Transactions</th>
+                  <th>Size</th>
+                </tr>
+              </thead>
+
+              <tbody id="explorer-blocks">
+                <tr>
+                  <td colspan="5">
+                    Loading blocks...
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+      </section>
+
+
+      <!-- ABOUT -->
+
+      <section
+        class="view"
+        id="view-about"
+      >
+
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">NOUVEAU-VISION</p>
+            <h2>About NVU</h2>
+          </div>
+        </div>
+
+
+        <div class="dashboard-grid">
+
+          <article class="panel">
+
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">NETWORK</p>
+                <h3>Nouveau-Vision Unit</h3>
+              </div>
+            </div>
+
+            <dl class="detail-list">
+
+              <div>
+                <dt>Ticker</dt>
+                <dd>NVU</dd>
+              </div>
+
+              <div>
+                <dt>Algorithm</dt>
+                <dd>SHA-256</dd>
+              </div>
+
+              <div>
+                <dt>Node</dt>
+                <dd>NVUN</dd>
+              </div>
+
+              <div>
+                <dt>P2P Port</dt>
+                <dd>9333</dd>
+              </div>
+
+              <div>
+                <dt>Mining</dt>
+                <dd>ASICseer Solo</dd>
+              </div>
+
+              <div>
+                <dt>Stratum Port</dt>
+                <dd>3336</dd>
+              </div>
+
+            </dl>
+
+          </article>
+
+
+          <article class="panel">
+
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">APPLICATION</p>
+                <h3>NVU on Umbrel</h3>
+              </div>
+            </div>
+
+            <p class="about-copy">
+              Run an independent Nouveau-Vision Unit full node,
+              participate directly in the NVU peer-to-peer network,
+              monitor the blockchain, explore recent blocks, and
+              operate an ASICseer SHA-256 solo mining endpoint from
+              your own Umbrel.
+            </p>
+
+            <div class="link-list">
+
+              <a
+                href="https://nvu.us"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                NVU Website
+              </a>
+
+              <a
+                href="https://nouveau-vision.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Nouveau-Vision
+              </a>
+
+              <a
+                href="https://github.com/thenouveauvision/nouveau-vision-umbrel"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Source Code
+              </a>
+
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <p class="version-line">
+          Nouveau-Vision NVU Dashboard
+          <span id="dashboard-version">0.2.0</span>
+        </p>
+
+      </section>
+
+    </main>
+
+
+    <footer>
+      <span>Nouveau-Vision Unit</span>
+      <span class="footer-separator">•</span>
+      <span>Run Your Node. Build the Network.</span>
+    </footer>
+
+  </div>
+
+
+  <script src="/static/app.js"></script>
+
+</body>
+</html>

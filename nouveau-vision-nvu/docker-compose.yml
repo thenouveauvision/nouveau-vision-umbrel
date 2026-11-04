@@ -1,7 +1,60 @@
 services:
 
+  app_proxy:
+    environment:
+      APP_HOST: nouveau-vision-nvu_dashboard_1
+      APP_PORT: 8080
+    networks:
+      - default
+
+  dashboard:
+    image: ghcr.io/thenouveauvision/nouveau-vision-dashboard:0.2.0
+    restart: unless-stopped
+    init: true
+
+    environment:
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: 8080
+
+      NVUN_RPC_HOST: nvun
+      NVUN_RPC_PORT: 9332
+      NVUN_RPC_USER: nvupool
+      NVUN_CREDENTIALS_DIR: /run/nvu-credentials
+
+      ASICSEER_LOG_DIR: /var/log/asicseer
+      ASICSEER_STRATUM_PORT: 3336
+      NVUN_P2P_PORT: 9333
+
+      DASHBOARD_LATEST_BLOCKS: 20
+
+    depends_on:
+      nvun:
+        condition: service_healthy
+
+      asicseer:
+        condition: service_started
+
+    volumes:
+      - nvu-credentials:/run/nvu-credentials:ro
+      - asicseer-logs:/var/log/asicseer:ro
+
+    networks:
+      - default
+      - nvu-network
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
   nvun:
-    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:0.1.1
+    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:0.2.0
     container_name: nouveau-vision-nvun
     restart: unless-stopped
 
@@ -27,7 +80,7 @@ services:
           - nvun
 
   asicseer:
-    image: ghcr.io/thenouveauvision/nouveau-vision-asicseer:0.1.1
+    image: ghcr.io/thenouveauvision/nouveau-vision-asicseer:0.2.0
     container_name: nouveau-vision-asicseer
     restart: unless-stopped
 
@@ -43,13 +96,22 @@ services:
       - "3336:3335"
 
     networks:
-      - nvu-network
+      nvu-network:
+        aliases:
+          - asicseer
 
 volumes:
+
   nvu-data:
+    name: nouveau-vision-nvu_nvu-data
+
   nvu-credentials:
+    name: nouveau-vision-nvu_nvu-credentials
+
   asicseer-logs:
+    name: nouveau-vision-nvu_asicseer-logs
 
 networks:
+
   nvu-network:
     driver: bridge
