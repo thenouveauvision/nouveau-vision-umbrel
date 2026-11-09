@@ -8,7 +8,7 @@ services:
       - default
 
   dashboard:
-    image: ghcr.io/thenouveauvision/nouveau-vision-dashboard:0.2.2
+    image: ghcr.io/thenouveauvision/nouveau-vision-dashboard:1.1.0
     restart: unless-stopped
     init: true
 
@@ -54,7 +54,7 @@ services:
       - ALL
 
   nvun:
-    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:0.2.0
+    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:1.0.0
     container_name: nouveau-vision-nvun
     restart: unless-stopped
 

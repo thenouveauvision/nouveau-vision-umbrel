@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from flask import Flask, jsonify, request, send_from_directory
 
 from asicseer_status import ASICseerStatus
+from asicseer_workers import ASICseerWorkers
 from blocks_found import BlocksFoundParser
 from nvu_rpc import NVURPC, NVURPCError
 
@@ -20,6 +21,7 @@ app = Flask(
 
 rpc = NVURPC()
 asicseer = ASICseerStatus()
+asicseer_workers = ASICseerWorkers()
 blocks_found = BlocksFoundParser()
 
 
@@ -77,6 +79,7 @@ def status():
     blockchain = rpc.blockchain_info()
     network = rpc.network_info()
     peers = rpc.peer_info()
+    uptime_seconds = rpc.uptime()
     pool = asicseer.status()
 
     inbound = sum(
@@ -92,6 +95,10 @@ def status():
 
         "nvun": {
             "online": True,
+            "uptimeSeconds": uptime_seconds,
+            "sizeOnDisk": blockchain.get(
+                "size_on_disk"
+            ),
             "version": network.get("subversion"),
             "protocolVersion": network.get(
                 "protocolversion"
@@ -194,6 +201,153 @@ def peers():
     })
 
 
+@app.route("/api/wallet/status")
+def wallet_status():
+    loaded_wallets = rpc.list_wallets()
+    info = rpc.wallet_info()
+
+    wallet_name = info.get(
+        "walletname",
+        "",
+    )
+
+    return jsonify({
+        "ok": True,
+
+        "loaded": True,
+
+        "walletName":
+            wallet_name,
+
+        "displayName":
+            wallet_name
+            if wallet_name
+            else "Default Wallet",
+
+        "loadedWallets":
+            loaded_wallets,
+
+        "walletVersion":
+            info.get(
+                "walletversion"
+            ),
+
+        "balance":
+            info.get(
+                "balance"
+            ),
+
+        "unconfirmedBalance":
+            info.get(
+                "unconfirmed_balance"
+            ),
+
+        "immatureBalance":
+            info.get(
+                "immature_balance"
+            ),
+
+        "transactionCount":
+            info.get(
+                "txcount"
+            ),
+
+        "privateKeysEnabled":
+            info.get(
+                "private_keys_enabled"
+            ),
+
+        "keypoolSize":
+            info.get(
+                "keypoolsize"
+            ),
+
+        "keypoolSizeInternal":
+            info.get(
+                "keypoolsize_hd_internal"
+            ),
+
+        "payTxFee":
+            info.get(
+                "paytxfee"
+            ),
+    })
+
+
+@app.route("/api/wallet/transactions")
+def wallet_transactions():
+    requested = request.args.get(
+        "limit",
+        "10",
+    )
+
+    try:
+        limit = int(requested)
+
+    except (TypeError, ValueError):
+        return api_error(
+            "limit must be an integer",
+            400,
+        )
+
+    limit = max(
+        1,
+        min(
+            limit,
+            50,
+        ),
+    )
+
+    transactions = (
+        rpc.wallet_transactions(
+            count=limit,
+            skip=0,
+            include_watchonly=True,
+        )
+    )
+
+    if not isinstance(
+        transactions,
+        list,
+    ):
+        transactions = []
+
+    return jsonify({
+        "ok": True,
+        "count": len(
+            transactions
+        ),
+        "transactions":
+            transactions,
+    })
+
+
+@app.route("/api/wallet/addresses")
+def wallet_addresses():
+    addresses = (
+        rpc.received_addresses(
+            min_confirmations=0,
+            include_empty=True,
+            include_watchonly=True,
+        )
+    )
+
+    if not isinstance(
+        addresses,
+        list,
+    ):
+        addresses = []
+
+    return jsonify({
+        "ok": True,
+        "count": len(
+            addresses
+        ),
+        "addresses":
+            addresses,
+    })
+
+
 @app.route("/api/mining")
 def mining():
     pool = asicseer.status()
@@ -217,6 +371,40 @@ def mining():
                 "9332",
             )
         ),
+    })
+
+
+@app.route("/api/mining/workers")
+def mining_workers():
+    requested = request.args.get(
+        "activeWindow",
+        "300",
+    )
+
+    try:
+        active_window = int(requested)
+
+    except (TypeError, ValueError):
+        return api_error(
+            "activeWindow must be an integer",
+            400,
+        )
+
+    active_window = max(
+        30,
+        min(
+            active_window,
+            3600,
+        ),
+    )
+
+    result = asicseer_workers.status(
+        active_window=active_window
+    )
+
+    return jsonify({
+        "ok": True,
+        **result,
     })
 
 

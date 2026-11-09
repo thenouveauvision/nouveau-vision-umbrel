@@ -22,6 +22,7 @@ RUN pip install \
 COPY server.py /app/server.py
 COPY nvu_rpc.py /app/nvu_rpc.py
 COPY asicseer_status.py /app/asicseer_status.py
+COPY asicseer_workers.py /app/asicseer_workers.py
 COPY blocks_found.py /app/blocks_found.py
 COPY static /app/static
 

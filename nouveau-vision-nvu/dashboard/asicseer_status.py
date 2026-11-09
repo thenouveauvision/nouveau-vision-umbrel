@@ -147,6 +147,72 @@ class ASICseerStatus:
 
         return combined
 
+    def _log_contains(self, phrase):
+        path = self._primary_log()
+
+        if path is None:
+            return False
+
+        try:
+            with path.open(
+                "r",
+                encoding="utf-8",
+                errors="replace",
+            ) as handle:
+                for line in handle:
+                    if phrase in line:
+                        return True
+
+        except OSError:
+            return False
+
+        return False
+
+    def _current_rpc_connected(self, text):
+        success_markers = (
+            "Connected to bitcoind",
+            "BLOCK ACCEPTED!",
+            "confirms block was CONFIRMED",
+            "Stored local workbase",
+        )
+
+        failure_markers = (
+            "Unable to connect socket",
+            "Failed to connect socket",
+            "Failed to get valid json response",
+            "Failed to get block template",
+            "No bitcoinds active",
+            "Generator failed in update_base",
+        )
+
+        latest_success = -1
+        latest_failure = -1
+
+        for marker in success_markers:
+            latest_success = max(
+                latest_success,
+                text.rfind(marker),
+            )
+
+        for marker in failure_markers:
+            latest_failure = max(
+                latest_failure,
+                text.rfind(marker),
+            )
+
+        if (
+            latest_success >= 0
+            or latest_failure >= 0
+        ):
+            return (
+                latest_success
+                > latest_failure
+            )
+
+        return self._log_contains(
+            "Connected to bitcoind"
+        )
+
     @staticmethod
     def _latest_timestamp(text):
         pattern = re.compile(
@@ -181,29 +247,32 @@ class ASICseerStatus:
 
         statistics = self._pool_statistics(text)
 
-        solo_mode = self._contains(
-            text,
-            "Solo mode activated",
+        solo_mode = self._log_contains(
+            "Solo mode activated"
         )
 
-        generator_ready = self._contains(
-            text,
-            "generator ready",
+        generator_ready = (
+            self._log_contains(
+                "generator ready"
+            )
         )
 
-        stratifier_ready = self._contains(
-            text,
-            "stratifier ready",
+        stratifier_ready = (
+            self._log_contains(
+                "stratifier ready"
+            )
         )
 
-        connector_ready = self._contains(
-            text,
-            "connector ready",
+        connector_ready = (
+            self._log_contains(
+                "connector ready"
+            )
         )
 
-        rpc_connected = self._contains(
-            text,
-            "Connected to bitcoind",
+        rpc_connected = (
+            self._current_rpc_connected(
+                text
+            )
         )
 
         recent_workbase = self._contains(

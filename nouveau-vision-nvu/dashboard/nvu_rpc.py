@@ -91,6 +91,50 @@ class NVURPC:
     def block_count(self):
         return self.call("getblockcount")
 
+    def uptime(self):
+        return self.call("uptime")
+
+    def list_wallets(self):
+        return self.call(
+            "listwallets"
+        )
+
+    def wallet_info(self):
+        return self.call(
+            "getwalletinfo"
+        )
+
+    def wallet_transactions(
+        self,
+        count=10,
+        skip=0,
+        include_watchonly=True,
+    ):
+        return self.call(
+            "listtransactions",
+            [
+                "*",
+                int(count),
+                int(skip),
+                bool(include_watchonly),
+            ],
+        )
+
+    def received_addresses(
+        self,
+        min_confirmations=0,
+        include_empty=True,
+        include_watchonly=True,
+    ):
+        return self.call(
+            "listreceivedbyaddress",
+            [
+                int(min_confirmations),
+                bool(include_empty),
+                bool(include_watchonly),
+            ],
+        )
+
     def difficulty(self):
         return self.call("getdifficulty")
 

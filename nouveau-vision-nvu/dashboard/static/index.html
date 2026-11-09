@@ -1,1000 +1,3764 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#060b14">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>Nouveau-Vision NVU</title>
+<title>NVU Dashboard</title>
 
-  <link rel="icon" href="/static/nvu-favicon.ico" sizes="64x64">
+<link rel="icon" type="image/x-icon" href="/static/nvu-favicon.ico">
 
-  <link rel="stylesheet" href="/static/app.css">
+<script src="/static/app.js" defer></script>
+
+<style>
+:root {
+    --bg: #060b13;
+    --bg-deep: #04080e;
+    --panel: rgba(12, 24, 39, 0.80);
+    --panel-strong: rgba(15, 30, 48, 0.94);
+
+    --border: rgba(95, 211, 255, 0.16);
+    --border-strong: rgba(95, 211, 255, 0.35);
+
+    --text: #edf5fa;
+    --text-soft: #cbd6dd;
+    --muted: #8598a8;
+    --muted-dark: #607585;
+
+    --cyan: #43d8ff;
+    --blue: #168cff;
+    --green: #48e0a4;
+    --red: #ff6878;
+
+    --shadow: 0 20px 60px rgba(0,0,0,.30);
+
+    --header-height: 76px;
+    --context-height: 43px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--text);
+
+    background:
+        radial-gradient(
+            circle at 15% -5%,
+            rgba(22,140,255,.16),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 85% 5%,
+            rgba(67,216,255,.09),
+            transparent 28%
+        ),
+        linear-gradient(
+            180deg,
+            #07101a 0%,
+            var(--bg) 52%,
+            var(--bg-deep) 100%
+        );
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(67,216,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(67,216,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 52px 52px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.65),
+            transparent 75%
+        );
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+}
+
+.shell {
+    width: min(1440px, calc(100% - 44px));
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   STICKY HEADER
+   ========================================================= */
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    min-height: var(--header-height);
+
+    background: rgba(5, 11, 19, .91);
+    border-bottom: 1px solid rgba(255,255,255,.065);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.header-inner {
+    min-height: var(--header-height);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 26px;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+
+    min-width: 260px;
+    gap: 13px;
+}
+
+.brand-mark {
+    width: 50px;
+    height: 50px;
+    flex: 0 0 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+    border-radius: 12px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(67,216,255,.10),
+            transparent 70%
+        );
+
+    filter:
+        drop-shadow(0 0 13px rgba(67,216,255,.16));
+}
+
+.brand-mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.brand-title {
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 750;
+
+    letter-spacing: .22em;
+    white-space: nowrap;
+}
+
+.brand-subtitle {
+    margin-top: 4px;
+
+    color: var(--cyan);
+
+    font-size: 10px;
+    font-weight: 750;
+
+    letter-spacing: .16em;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+nav a {
+    padding: 9px 13px;
+
+    color: #91a4b3;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    transition:
+        color .18s ease,
+        background .18s ease;
+}
+
+nav a:hover,
+nav a.active {
+    color: var(--text);
+    background: rgba(67,216,255,.075);
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.header-status {
+    min-width: 140px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    color: #bff5dc;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .10em;
+    white-space: nowrap;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+
+    flex: 0 0 8px;
+
+    border-radius: 50%;
+    background: var(--green);
+
+    box-shadow:
+        0 0 14px rgba(72,224,164,.70);
+}
+
+
+/* =========================================================
+   CONTEXT BAR
+   ========================================================= */
+
+.context-bar {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 900;
+
+    min-height: var(--context-height);
+
+    background: rgba(7, 16, 26, .89);
+    border-bottom: 1px solid rgba(67,216,255,.09);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.context-inner {
+    min-height: var(--context-height);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.context-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    color: #768b9c;
+    font-size: 10px;
+    letter-spacing: .05em;
+}
+
+.context-title strong {
+    color: var(--cyan);
+
+    font-size: 9px;
+    font-weight: 850;
+
+    letter-spacing: .18em;
+}
+
+.context-title span::before {
+    content: "•";
+
+    margin-right: 10px;
+    color: #354d60;
+}
+
+.context-health {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: #92c6ab;
+
+    font-size: 9px;
+    font-weight: 750;
+
+    letter-spacing: .11em;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+main {
+    padding-top: 4px;
+}
+
+section {
+    padding: 26px 0;
+
+    scroll-margin-top:
+        calc(
+            var(--header-height) +
+            var(--context-height) +
+            18px
+        );
+}
+
+main > section:first-child {
+    padding-top: 28px;
+}
+
+.section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.section-kicker {
+    color: var(--cyan);
+    text-transform: uppercase;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .22em;
+}
+
+.section-title {
+    margin-top: 5px;
+
+    font-size: 24px;
+    letter-spacing: -.02em;
+}
+
+.section-note {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.network-update {
+    text-align: right;
+    line-height: 1.35;
+}
+
+.last-updated {
+    margin-top: 4px;
+    color: #607585;
+    font-size: 9px;
+    letter-spacing: .04em;
+}
+
+#last-updated-time {
+    color: #8298a8;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SUMMARY STRIP
+   ========================================================= */
+
+.summary-strip {
+    display: flex;
+    align-items: center;
+
+    gap: 24px;
+
+    margin-bottom: 18px;
+    padding: 11px 15px;
+
+    border: 1px solid rgba(67,216,255,.10);
+    border-radius: 10px;
+
+    background: rgba(7,17,28,.60);
+
+    color: #6f8495;
+    font-size: 10px;
+
+    overflow-x: auto;
+}
+
+.summary-item {
+    white-space: nowrap;
+}
+
+.summary-item strong {
+    margin-left: 5px;
+
+    color: #cbd8e0;
+    font-weight: 650;
+}
+
+.summary-item.good strong {
+    color: var(--green);
+}
+
+
+/* =========================================================
+   SHARED CARDS
+   ========================================================= */
+
+.card,
+.node-card,
+.detail-card,
+.block-card,
+.peer-panel {
+    border: 1px solid var(--border);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(17,33,51,.80),
+            rgba(7,16,27,.84)
+        );
+
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+
+/* =========================================================
+   METRICS
+   ========================================================= */
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.card {
+    min-height: 142px;
+    padding: 18px;
+    border-radius: 14px;
+
+    transition:
+        border-color .18s ease,
+        transform .18s ease,
+        background .18s ease;
+}
+
+.card:hover {
+    border-color: rgba(67,216,255,.30);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(20,39,60,.86),
+            rgba(8,18,30,.88)
+        );
+
+    transform: translateY(-1px);
+}
+
+.card-label {
+    color: #7f93a4;
+    text-transform: uppercase;
+
+    font-weight: 700;
+    letter-spacing: .14em;
+    font-size: 9px;
+}
+
+.card-value {
+    margin-top: 22px;
+
+    font-size: 27px;
+    font-weight: 650;
+
+    letter-spacing: -.035em;
+    overflow-wrap: anywhere;
+}
+
+.card-value.cyan {
+    color: var(--cyan);
+}
+
+.card-value.green {
+    color: var(--green);
+}
+
+.card-foot {
+    margin-top: 9px;
+
+    color: #64798a;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   LOCAL UMBREL NODE
+   ========================================================= */
+
+.local-node-strip {
+    position: relative;
+
+    display: grid;
+    grid-template-columns:
+        minmax(175px, .85fr)
+        minmax(0, 2fr)
+        minmax(115px, .55fr);
+
+    align-items: center;
+    gap: 26px;
+
+    margin-bottom: 15px;
+    padding: 21px 23px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(17,33,51,.84),
+            rgba(7,16,27,.88)
+        );
+
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.local-node-glow {
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    top: -120px;
+    left: -80px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(67,216,255,.12);
+
+    filter: blur(35px);
+
+    pointer-events: none;
+}
+
+.local-node-identity,
+.local-node-stats,
+.local-node-state {
+    position: relative;
+    z-index: 1;
+}
+
+.local-node-identity {
+    min-width: 0;
+    padding-top: 11px;
+}
+
+.local-node-badge {
+    position: absolute;
+
+    top: -21px;
+    left: 0;
+
+    padding: 5px 9px;
+
+    border-radius: 0 0 6px 6px;
+
+    background: var(--cyan);
+    color: #03101a;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: .12em;
+}
+
+.local-node-name {
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.local-node-hostname {
+    margin-top: 6px;
+
+    color: var(--cyan);
+    font-size: 12px;
+}
+
+.local-node-stats {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+.local-node-state {
+    text-align: right;
+}
+
+.local-node-sync {
+    margin-top: 7px;
+
+    color: #dbe8ef;
+
+    font-size: 15px;
+    font-weight: 650;
+}
+
+@media (max-width: 900px) {
+    .local-node-strip {
+        grid-template-columns:
+            1fr auto;
+    }
+
+    .local-node-stats {
+        grid-column: 1 / -1;
+        grid-row: 2;
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .local-node-strip {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .local-node-stats {
+        grid-column: auto;
+        grid-row: auto;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .local-node-state {
+        text-align: left;
+    }
+}
+
+
+/* =========================================================
+   NODE CARDS
+   ========================================================= */
+
+.network-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.node-card {
+    position: relative;
+
+    min-height: 220px;
+    overflow: hidden;
+
+    padding: 23px;
+    border-radius: 16px;
+}
+
+.node-card.current {
+    border-color: var(--border-strong);
+}
+
+.node-card.current::before {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    right: -75px;
+    top: -80px;
+
+    border-radius: 50%;
+    background: rgba(67,216,255,.12);
+
+    filter: blur(30px);
+}
+
+.current-badge {
+    position: absolute;
+
+    top: 0;
+    left: 22px;
+
+    padding: 5px 9px;
+
+    border-radius: 0 0 6px 6px;
+
+    background: var(--cyan);
+    color: #03101a;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: .12em;
+}
+
+.node-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+.node-name {
+    font-size: 18px;
+    font-weight: 650;
+}
+
+.node-status {
+    color: var(--green);
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .12em;
+    white-space: nowrap;
+}
+
+.hostname {
+    margin-top: 8px;
+
+    color: var(--cyan);
+    font-size: 12px;
+}
+
+.node-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.mini-label {
+    color: #647b8d;
+    text-transform: uppercase;
+
+    font-size: 8px;
+    font-weight: 750;
+
+    letter-spacing: .12em;
+}
+
+.mini-value {
+    margin-top: 5px;
+
+    color: #dbe8ef;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   COLLAPSIBLE PEER PANEL
+   ========================================================= */
+
+.peer-panel {
+    margin-top: 15px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.peer-toggle {
+    width: 100%;
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 17px 21px;
+
+    color: inherit;
+    background: transparent;
+
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+
+    transition: background .18s ease;
+}
+
+.peer-toggle:hover {
+    background: rgba(67,216,255,.045);
+}
+
+.peer-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: -2px;
+}
+
+.peer-toggle-copy {
+    min-width: 0;
+}
+
+.peer-toggle-title {
+    color: var(--cyan);
+
+    text-transform: uppercase;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    letter-spacing: .20em;
+}
+
+.peer-toggle-summary {
+    margin-top: 7px;
+
+    color: #a9bbc7;
+    font-size: 12px;
+}
+
+.peer-toggle-summary strong {
+    color: var(--text);
+    font-weight: 650;
+}
+
+.peer-toggle-action {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    color: #7790a3;
+
+    font-size: 10px;
+    font-weight: 750;
+
+    letter-spacing: .10em;
+    white-space: nowrap;
+}
+
+.peer-chevron {
+    display: inline-block;
+
+    color: var(--cyan);
+    font-size: 15px;
+
+    transition: transform .20s ease;
+}
+
+.peer-toggle[aria-expanded="true"] .peer-chevron {
+    transform: rotate(180deg);
+}
+
+.peer-content {
+    border-top: 1px solid rgba(67,216,255,.09);
+}
+
+.peer-content[hidden] {
+    display: none;
+}
+
+.peer-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.peer-table {
+    width: 100%;
+    min-width: 800px;
+
+    border-collapse: collapse;
+}
+
+.peer-table th,
+.peer-table td {
+    padding: 13px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.052);
+}
+
+.peer-table th {
+    color: #657b8c;
+    background: rgba(3,10,17,.25);
+
+    text-align: left;
+    text-transform: uppercase;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: .14em;
+    white-space: nowrap;
+}
+
+.peer-table td {
+    color: #afbec8;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.peer-table tbody tr {
+    transition: background .15s ease;
+}
+
+.peer-table tbody tr:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.peer-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.peer-address {
+    color: var(--cyan) !important;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Consolas,
+        monospace;
+
+    font-size: 10px !important;
+}
+
+.peer-number {
+    text-align: right;
+}
+
+.peer-direction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 67px;
+
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    font-size: 8px;
+    font-weight: 850;
+
+    letter-spacing: .10em;
+}
+
+.peer-direction.inbound {
+    color: #aef2d3;
+    border: 1px solid rgba(72,224,164,.22);
+    background: rgba(72,224,164,.07);
+}
+
+.peer-direction.outbound {
+    color: #a9dcff;
+    border: 1px solid rgba(67,216,255,.22);
+    background: rgba(67,216,255,.07);
+}
+
+.peer-empty {
+    padding: 28px 18px !important;
+
+    color: #5f7688 !important;
+    text-align: center;
+}
+
+.peer-footer {
+    min-height: 61px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 12px 18px;
+
+    border-top: 1px solid rgba(67,216,255,.08);
+    background: rgba(3,10,17,.22);
+}
+
+.peer-page-status {
+    color: #687e8f;
+    font-size: 10px;
+}
+
+.peer-pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.peer-page-button {
+    min-width: 78px;
+
+    padding: 8px 11px;
+
+    border: 1px solid rgba(67,216,255,.16);
+    border-radius: 8px;
+
+    color: #a9bbc7;
+    background: rgba(67,216,255,.045);
+
+    font-size: 9px;
+    font-weight: 750;
+
+    letter-spacing: .07em;
+
+    cursor: pointer;
+
+    transition:
+        color .15s ease,
+        border-color .15s ease,
+        background .15s ease;
+}
+
+.peer-page-button:hover:not(:disabled) {
+    color: var(--text);
+    border-color: rgba(67,216,255,.34);
+    background: rgba(67,216,255,.09);
+}
+
+.peer-page-button:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+}
+
+.peer-page-button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   DETAILS
+   ========================================================= */
+
+.details {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+
+    gap: 15px;
+}
+
+.detail-card {
+    padding: 23px;
+    border-radius: 16px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+    padding: 13px 0;
+
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.detail-row:last-child {
+    border-bottom: 0;
+}
+
+.detail-key {
+    color: #718697;
+    font-size: 12px;
+}
+
+.detail-value {
+    max-width: 70%;
+
+    color: #d5e1e8;
+    font-size: 12px;
+
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.block-hash {
+    color: #a9bbc7;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Consolas,
+        monospace;
+}
+
+
+/* =========================================================
+   BLOCKS
+   ========================================================= */
+
+.blocks {
+    display: grid;
+    gap: 8px;
+}
+
+.block-card {
+    min-height: 68px;
+
+    display: grid;
+
+    grid-template-columns:
+        90px 1fr 160px 80px;
+
+    align-items: center;
+
+    gap: 20px;
+    padding: 12px 18px;
+
+    border-radius: 10px;
+}
+
+.block-height {
+    color: var(--cyan);
+    font-weight: 700;
+}
+
+.block-time,
+.block-tx {
+    color: #718697;
+    font-size: 11px;
+}
+
+.placeholder {
+    color: #526a7c;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    margin-top: 44px;
+    padding: 26px 0 36px;
+
+    border-top: 1px solid rgba(255,255,255,.055);
+
+    color: #5e7284;
+    font-size: 11px;
+}
+
+.footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+}
+
+.footer-brand {
+    color: #879aaa;
+    letter-spacing: .05em;
+}
+
+.footer-version {
+    margin-top: 5px;
+    color: #607585;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .06em;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1180px) {
+    .metrics {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .header-status {
+        min-width: auto;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+    :root {
+        --header-height: 68px;
+        --context-height: 40px;
+    }
+
+    .shell {
+        width: min(calc(100% - 28px), 1440px);
+    }
+
+    .header-inner {
+        gap: 12px;
+    }
+
+    .brand {
+        min-width: 0;
+    }
+
+    .brand-mark {
+        width: 43px;
+        height: 43px;
+        flex-basis: 43px;
+    }
+
+    .brand-title {
+        font-size: 11px;
+        letter-spacing: .17em;
+    }
+
+    .brand-subtitle {
+        font-size: 9px;
+    }
+
+    nav {
+        display: none;
+    }
+
+    .header-status {
+        margin-left: auto;
+
+        font-size: 8px;
+        letter-spacing: .07em;
+    }
+
+    .context-health {
+        display: none;
+    }
+
+    .context-title {
+        gap: 8px;
+    }
+
+    .context-title span:nth-of-type(2) {
+        display: none;
+    }
+
+    section {
+        padding: 22px 0;
+    }
+
+    .metrics,
+    .network-grid,
+    .details {
+        grid-template-columns: 1fr;
+    }
+
+    .metrics {
+        gap: 9px;
+    }
+
+    .card {
+        min-height: 120px;
+    }
+
+    .card-value {
+        margin-top: 15px;
+    }
+
+    .summary-strip {
+        gap: 18px;
+    }
+
+    .section-head {
+        align-items: flex-start;
+    }
+
+    .section-note {
+        display: none;
+    }
+
+    .peer-toggle {
+        min-height: 72px;
+        padding: 15px 17px;
+    }
+
+    .peer-toggle-action span:first-child {
+        display: none;
+    }
+
+    .peer-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .peer-pagination {
+        width: 100%;
+    }
+
+    .peer-page-button {
+        flex: 1;
+    }
+
+    .block-card {
+        grid-template-columns: 70px 1fr;
+        gap: 10px;
+    }
+
+    .block-time,
+    .block-tx {
+        display: none;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-value {
+        max-width: 100%;
+        text-align: left;
+    }
+
+    .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+    .brand-title {
+        font-size: 10px;
+    }
+
+    .header-status {
+        font-size: 0;
+    }
+
+    .header-status .dot {
+        width: 9px;
+        height: 9px;
+    }
+
+    .context-title span:nth-of-type(3) {
+        display: none;
+    }
+
+    .section-title {
+        font-size: 21px;
+    }
+}
+
+/* =========================================================
+   RECENT MINING BLOCKS
+   ========================================================= */
+
+#mining-history {
+    padding-top: 0;
+}
+
+.mining-block-panel {
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(17,33,51,.80),
+            rgba(7,16,27,.84)
+        );
+
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.mining-block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    min-height: 76px;
+    padding: 17px 20px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.mining-block-header-note {
+    color: #647b8d;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.mining-block-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.mining-block-table {
+    width: 100%;
+    min-width: 820px;
+
+    border-collapse: collapse;
+}
+
+.mining-block-table th,
+.mining-block-table td {
+    padding: 13px 18px;
+
+    border-bottom:
+        1px solid rgba(124,157,181,.10);
+
+    text-align: left;
+    vertical-align: middle;
+}
+
+.mining-block-table th {
+    color: #647b8d;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.mining-block-table td {
+    color: #dbe8ef;
+    font-size: 12px;
+}
+
+.mining-block-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.mining-block-table tbody tr:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.mining-block-height {
+    color: var(--cyan);
+    font-weight: 750;
+}
+
+.mining-block-worker {
+    font-weight: 650;
+}
+
+.mining-block-account {
+    display: block;
+    margin-top: 4px;
+
+    color: rgba(67,216,255,.68);
+
+    font-size: 10px;
+    font-weight: 500;
+
+    letter-spacing: .01em;
+    white-space: nowrap;
+}
+
+.mining-block-found {
+    color: #9eb1bf;
+    white-space: nowrap;
+}
+
+.mining-block-status {
+    color: var(--green);
+
+    font-size: 12px;
+    font-weight: 400;
+
+    letter-spacing: .02em;
+    text-transform: none;
+}
+
+.mining-block-footer {
+    padding: 15px 18px;
+}
+
+@media (max-width: 620px) {
+    .mining-block-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .mining-block-header-note {
+        white-space: normal;
+    }
+}
+
+
+
+/* =========================================================
+   CONNECTED MINERS
+   ========================================================= */
+
+#connected-miners {
+    padding-top: 0;
+}
+
+.miners-panel {
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(17,33,51,.80),
+            rgba(7,16,27,.84)
+        );
+
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.miners-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    min-height: 76px;
+    gap: 20px;
+    padding: 17px 20px;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.miners-toggle:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.miners-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: -2px;
+}
+
+.miners-toggle-copy {
+    min-width: 0;
+}
+
+.miners-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--cyan);
+
+    font-size: 10px;
+    font-weight: 750;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.miners-chevron {
+    display: inline-block;
+
+    font-size: 15px;
+    line-height: 1;
+
+    transition: transform .18s ease;
+}
+
+.miners-toggle[aria-expanded="true"]
+.miners-chevron {
+    transform: rotate(180deg);
+}
+
+.miners-content {
+    border-top: 1px solid var(--border);
+}
+
+.miners-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.miners-table {
+    width: 100%;
+    min-width: 760px;
+
+    border-collapse: collapse;
+}
+
+.miners-table th,
+.miners-table td {
+    padding: 14px 18px;
+
+    border-bottom:
+        1px solid rgba(124,157,181,.10);
+
+    text-align: left;
+    vertical-align: middle;
+}
+
+.miners-table th {
+    color: #647b8d;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.miners-table td {
+    color: #dbe8ef;
+    font-size: 12px;
+}
+
+.miners-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.miners-table tbody tr:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.miner-worker-name {
+    color: #dbe8ef;
+    font-weight: 650;
+}
+
+.miner-account {
+    display: block;
+    margin-top: 4px;
+
+    color: rgba(67,216,255,.68);
+
+    font-size: 10px;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+.miner-hashrate,
+.miner-best-diff {
+    color: var(--cyan);
+    white-space: nowrap;
+}
+
+.miner-time {
+    color: #9eb1bf;
+    white-space: nowrap;
+}
+
+.miners-note {
+    padding: 13px 18px;
+
+    border-top:
+        1px solid rgba(124,157,181,.10);
+
+    color: #647b8d;
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+    .miners-toggle {
+        align-items: flex-start;
+    }
+
+    .miners-toggle-action span:first-child {
+        display: none;
+    }
+}
+
+
+
+/* =========================================================
+   LOCAL WALLET
+   ========================================================= */
+
+.wallet-balance {
+    font-size: 23px;
+}
+
+.wallet-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, .9fr)
+        minmax(0, 1.4fr);
+
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.wallet-panel {
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(17,33,51,.80),
+            rgba(7,16,27,.84)
+        );
+
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+.wallet-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    min-height: 76px;
+    padding: 17px 20px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.wallet-panel-title {
+    color: #dbe8ef;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.wallet-panel-subtitle {
+    margin-top: 5px;
+
+    color: #647b8d;
+    font-size: 10px;
+}
+
+.wallet-readonly-badge {
+    padding: 5px 8px;
+
+    border: 1px solid rgba(67,216,255,.22);
+    border-radius: 6px;
+
+    color: rgba(67,216,255,.78);
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+.wallet-panel-count {
+    color: var(--cyan);
+
+    font-size: 18px;
+    font-weight: 650;
+}
+
+.wallet-empty-state {
+    min-height: 140px;
+    padding: 32px 20px;
+
+    color: #8297a7;
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.wallet-address-list {
+    padding: 0 20px;
+}
+
+.wallet-address-item {
+    padding: 17px 0;
+
+    border-bottom:
+        1px solid rgba(124,157,181,.10);
+}
+
+.wallet-address-item:last-child {
+    border-bottom: 0;
+}
+
+.wallet-address-value {
+    color: var(--cyan);
+
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+.wallet-address-meta {
+    margin-top: 7px;
+
+    color: #647b8d;
+    font-size: 10px;
+}
+
+.wallet-transaction-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.wallet-transaction-table {
+    width: 100%;
+    min-width: 620px;
+
+    border-collapse: collapse;
+}
+
+.wallet-transaction-table th,
+.wallet-transaction-table td {
+    padding: 13px 16px;
+
+    border-bottom:
+        1px solid rgba(124,157,181,.10);
+
+    text-align: left;
+    vertical-align: middle;
+}
+
+.wallet-transaction-table th {
+    color: #647b8d;
+
+    font-size: 8px;
+    font-weight: 800;
+
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.wallet-transaction-table td {
+    color: #dbe8ef;
+    font-size: 11px;
+}
+
+.wallet-transaction-table
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.wallet-amount-positive {
+    color: var(--green);
+}
+
+.wallet-amount-negative {
+    color: #e6a06f;
+}
+
+.wallet-safety-note {
+    margin-top: 15px;
+    padding: 14px 17px;
+
+    border: 1px solid rgba(67,216,255,.12);
+    border-radius: 12px;
+
+    background: rgba(67,216,255,.025);
+    color: #647b8d;
+
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .wallet-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+</style>
 </head>
+
 
 <body>
 
-  <div class="app-shell">
+<header>
+<div class="shell header-inner">
 
-    <header class="topbar">
-
-      <div class="brand">
-        <img
-          class="brand-icon"
-          src="/static/nvu-umbrel-app-icon.png"
-          alt="Nouveau-Vision Unit"
-        >
-
-        <div class="brand-copy">
-          <h1>Nouveau-Vision Unit</h1>
-          <p>NVU Node, Mining &amp; Network Dashboard</p>
-        </div>
-      </div>
-
-      <div class="network-summary">
-
-        <div class="summary-item">
-          <span class="status-dot" id="network-dot"></span>
-
-          <div>
-            <span class="summary-label">Network</span>
-            <strong id="network-status">Connecting...</strong>
-          </div>
+    <a class="brand" href="#overview">
+        <div class="brand-mark">
+            <img
+                src="/static/nvu-umbrel-app-icon.png"
+                alt="Nouveau-Vision Unit">
         </div>
 
-        <div class="summary-item">
-          <span class="summary-label">Block</span>
-          <strong id="header-height">--</strong>
+        <div>
+            <div class="brand-title">NOUVEAU-VISION</div>
+            <div class="brand-subtitle">NVU DASHBOARD</div>
         </div>
-
-        <div class="summary-item">
-          <span class="summary-label">Peers</span>
-          <strong id="header-peers">--</strong>
-        </div>
-
-        <div class="summary-item">
-          <span class="summary-label">Mining</span>
-          <strong id="header-mining">--</strong>
-        </div>
-
-      </div>
-
-    </header>
+    </a>
 
 
-    <nav class="navigation" aria-label="Dashboard sections">
-
-      <button
-        class="nav-button active"
-        type="button"
-        data-view="overview"
-      >
-        Overview
-      </button>
-
-      <button
-        class="nav-button"
-        type="button"
-        data-view="network"
-      >
-        Network
-      </button>
-
-      <button
-        class="nav-button"
-        type="button"
-        data-view="mining"
-      >
-        Mining
-      </button>
-
-      <button
-        class="nav-button"
-        type="button"
-        data-view="explorer"
-      >
-        Explorer
-      </button>
-
-      <button
-        class="nav-button"
-        type="button"
-        data-view="about"
-      >
-        About
-      </button>
-
+    <nav>
+        <a class="active" href="#overview">Overview</a>
+        <a href="#network">Network</a>
+        <a href="#blockchain">Blockchain</a>
+        <a href="#node">Node</a>
+        <a href="#mining">Mining</a>
+        <a href="#wallet">Wallet</a>
     </nav>
 
 
-    <main>
+    <div class="header-status">
+        <span class="dot"></span>
+        NODE ONLINE
+    </div>
 
-      <!-- OVERVIEW -->
-
-      <section
-        class="view active"
-        id="view-overview"
-      >
-
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">NVU NETWORK</p>
-            <h2>Network Overview</h2>
-          </div>
-
-          <div
-            class="last-updated"
-            id="last-updated"
-          >
-            Waiting for node data...
-          </div>
-        </div>
+</div>
+</header>
 
 
-        <div class="metric-grid overview-primary-grid">
+<div class="context-bar">
+<div class="shell context-inner">
 
-          <article class="metric-card">
-            <span class="metric-label">NVUN Node</span>
-            <strong
-              class="metric-value"
-              id="overview-node-status"
-            >
-              Connecting...
-            </strong>
-            <span
-              class="metric-detail"
-              id="overview-version"
-            >
-              --
-            </span>
-          </article>
+    <div class="context-title">
+        <strong>NETWORK OVERVIEW</strong>
+        <span id="context-node-name">NVU Node</span>
+        <span id="context-node-hostname">Local Node</span>
+        <span>NVUN v1.0.0</span>
+    </div>
 
-          <article class="metric-card">
-            <span class="metric-label">Block Height</span>
-            <strong
-              class="metric-value accent"
-              id="overview-height"
-            >
-              --
-            </strong>
-            <span class="metric-detail">
-              Current NVU chain tip
-            </span>
-          </article>
+    <div class="context-health">
+        <span class="dot"></span>
+        NETWORK HEALTHY
+    </div>
 
-        </div>
+</div>
+</div>
 
 
-        <div class="metric-grid overview-status-grid">
-
-          <article class="metric-card">
-            <span class="metric-label">ASICseer</span>
-            <strong
-              class="metric-value"
-              id="overview-pool-status"
-            >
-              --
-            </strong>
-            <span
-              class="metric-detail"
-              id="overview-solo-status"
-            >
-              Solo mining
-            </span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Connected Peers</span>
-            <strong
-              class="metric-value"
-              id="overview-peers"
-            >
-              --
-            </strong>
-            <span
-              class="metric-detail"
-              id="overview-peer-detail"
-            >
-              --
-            </span>
-          </article>
-
-        </div>
+<main>
 
 
-        <div class="metric-grid overview-network-grid">
+<!-- =======================================================
+     OVERVIEW
+     ======================================================= -->
 
-          <article class="metric-card">
-            <span class="metric-label">Network Difficulty</span>
-            <strong
-              class="metric-value accent"
-              id="overview-difficulty-card"
-            >
-              --
-            </strong>
-            <span class="metric-detail">
-              Current mining difficulty
-            </span>
-          </article>
+<section id="overview">
+<div class="shell">
 
-          <article class="metric-card">
-            <span class="metric-label">Network Hashrate</span>
-            <strong
-              class="metric-value accent"
-              id="overview-network-hashrate-card"
-            >
-              --
-            </strong>
-            <span class="metric-detail">
-              Estimated by NVUN
-            </span>
-          </article>
-
-        </div>
-
-
-        <div class="dashboard-grid">
-
-          <article class="panel panel-wide">
-
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">BLOCKCHAIN</p>
-                <h3>Current Chain</h3>
-              </div>
+    <div class="section-head">
+        <div>
+            <div class="section-kicker">
+                Nouveau-Vision Unit
             </div>
 
-            <dl class="detail-list">
+            <div class="section-title">
+                Network Metrics
+            </div>
+        </div>
 
-              <div>
-                <dt>Best Block</dt>
-                <dd
-                  class="hash"
-                  id="overview-best-block"
+        <div class="section-note network-update">
+    <div>NVU Main Network</div>
+        <div class="last-updated">
+            Last updated <span id="last-updated-time">—</span>
+        </div>
+    </div>
+
+    </div>
+
+
+    <div class="summary-strip">
+
+        <div class="summary-item good">
+            NETWORK
+            <strong>HEALTHY</strong>
+        </div>
+
+        <div class="summary-item">
+            NODE
+            <strong>NVU NODE</strong>
+        </div>
+
+        <div class="summary-item">
+            SOFTWARE
+            <strong>NVUN 1.0.0</strong>
+        </div>
+
+        <div class="summary-item">
+            PROTOCOL
+            <strong>70016</strong>
+        </div>
+
+        <div class="summary-item">
+            P2P
+            <strong>9333</strong>
+        </div>
+
+    </div>
+
+
+    <div class="metrics">
+
+        <div class="card">
+            <div class="card-label">Block Height</div>
+            <div class="card-value cyan">—</div>
+            <div class="card-foot">Current chain tip</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Difficulty</div>
+            <div class="card-value">—</div>
+            <div class="card-foot">Current mining difficulty</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Connected Peers</div>
+            <div class="card-value">—</div>
+            <div class="card-foot">Local node connections</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Network Hashrate</div>
+            <div class="card-value">—</div>
+            <div class="card-foot">Estimated SHA-256 network rate</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Protocol</div>
+            <div class="card-value">70016</div>
+            <div class="card-foot">NVUN network protocol</div>
+        </div>
+
+        <div class="card">
+            <div class="card-label">Sync Status</div>
+            <div class="card-value green">SYNCED</div>
+            <div class="card-foot">
+                Initial block download complete
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+<!-- =======================================================
+     NETWORK
+     ======================================================= -->
+
+<section id="network">
+<div class="shell">
+
+    <div class="section-head">
+        <div>
+            <div class="section-kicker">
+                Infrastructure
+            </div>
+
+            <div class="section-title">
+                NVU Network Nodes
+            </div>
+        </div>
+
+        <div class="section-note">
+            Independent network participants
+        </div>
+    </div>
+
+
+    <div
+        class="local-node-strip"
+        id="umbrel-local-node"
+    >
+        <div class="local-node-glow"></div>
+
+        <div class="local-node-identity">
+            <div class="local-node-badge">
+                THIS NODE
+            </div>
+
+            <div class="local-node-name">
+                Umbrel
+            </div>
+
+            <div class="local-node-hostname">
+                umbrel.local
+            </div>
+        </div>
+
+        <div class="local-node-stats">
+
+            <div class="local-node-stat">
+                <div class="mini-label">
+                    Software
+                </div>
+                <div
+                    class="mini-value"
+                    id="umbrel-node-version"
                 >
-                  --
-                </dd>
-              </div>
+                    NVUN —
+                </div>
+            </div>
 
-              <div>
-                <dt>Difficulty</dt>
-                <dd id="overview-difficulty">
-                  --
-                </dd>
-              </div>
-
-              <div>
-                <dt>Network Hashrate</dt>
-                <dd id="overview-network-hashrate">
-                  --
-                </dd>
-              </div>
-
-              <div>
-                <dt>Verification</dt>
-                <dd id="overview-verification">
-                  --
-                </dd>
-              </div>
-
-              <div>
-                <dt>Chainwork</dt>
-                <dd
-                  class="hash"
-                  id="overview-chainwork"
+            <div class="local-node-stat">
+                <div class="mini-label">
+                    Height
+                </div>
+                <div
+                    class="mini-value"
+                    id="umbrel-node-height"
                 >
-                  --
-                </dd>
-              </div>
-
-            </dl>
-
-          </article>
-
-
-          <article class="panel">
-
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">SOLO MINING</p>
-                <h3>ASICseer Pool</h3>
-              </div>
-
-              <span
-                class="status-pill"
-                id="pool-status-pill"
-              >
-                Checking
-              </span>
+                    —
+                </div>
             </div>
 
-            <dl class="detail-list compact">
-
-              <div>
-                <dt>RPC</dt>
-                <dd id="pool-rpc-status">--</dd>
-              </div>
-
-              <div>
-                <dt>Generator</dt>
-                <dd id="pool-generator-status">--</dd>
-              </div>
-
-              <div>
-                <dt>Stratifier</dt>
-                <dd id="pool-stratifier-status">--</dd>
-              </div>
-
-              <div>
-                <dt>Workers</dt>
-                <dd id="pool-workers">--</dd>
-              </div>
-
-              <div>
-                <dt>Stratum</dt>
-                <dd id="pool-stratum">Port 3336</dd>
-              </div>
-
-            </dl>
-
-          </article>
-
-        </div>
-
-
-        <article class="panel">
-
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">BLOCKCHAIN</p>
-              <h3>Latest Blocks</h3>
+            <div class="local-node-stat">
+                <div class="mini-label">
+                    Protocol
+                </div>
+                <div
+                    class="mini-value"
+                    id="umbrel-node-protocol"
+                >
+                    —
+                </div>
             </div>
 
-            <button
-              type="button"
-              class="text-button"
-              data-go-view="explorer"
-            >
-              Open Explorer
-            </button>
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Height</th>
-                  <th>Block Hash</th>
-                  <th>Time</th>
-                  <th>Transactions</th>
-                  <th>Difficulty</th>
-                </tr>
-              </thead>
-
-              <tbody id="overview-blocks">
-                <tr>
-                  <td colspan="5">
-                    Loading blocks...
-                  </td>
-                </tr>
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </article>
-
-      </section>
-
-
-      <!-- NETWORK -->
-
-      <section
-        class="view"
-        id="view-network"
-      >
-
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">PEER-TO-PEER</p>
-            <h2>NVU Network</h2>
-          </div>
-        </div>
-
-
-        <div class="metric-grid">
-
-          <article class="metric-card">
-            <span class="metric-label">Total Peers</span>
-            <strong
-              class="metric-value"
-              id="network-peer-count"
-            >
-              --
-            </strong>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Inbound</span>
-            <strong
-              class="metric-value"
-              id="network-inbound"
-            >
-              --
-            </strong>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Outbound</span>
-            <strong
-              class="metric-value"
-              id="network-outbound"
-            >
-              --
-            </strong>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">P2P Port</span>
-            <strong class="metric-value">
-              9333
-            </strong>
-          </article>
-
-        </div>
-
-
-        <article class="panel">
-
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">LIVE PEERS</p>
-              <h3>Connected Nodes</h3>
-            </div>
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Peer</th>
-                  <th>Direction</th>
-                  <th>Version</th>
-                  <th>Height</th>
-                  <th>Received</th>
-                  <th>Sent</th>
-                </tr>
-              </thead>
-
-              <tbody id="peer-table">
-                <tr>
-                  <td colspan="6">
-                    Loading peers...
-                  </td>
-                </tr>
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </article>
-
-      </section>
-
-
-      <!-- MINING -->
-
-      <section
-        class="view"
-        id="view-mining"
-      >
-
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">SHA-256 SOLO MINING</p>
-            <h2>ASICseer Mining</h2>
-          </div>
-        </div>
-
-
-        <div class="metric-grid">
-
-          <article class="metric-card">
-            <span class="metric-label">Pool</span>
-            <strong
-              class="metric-value"
-              id="mining-pool-status"
-            >
-              --
-            </strong>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Mode</span>
-            <strong class="metric-value accent">
-              SOLO
-            </strong>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Users</span>
-            <strong
-              class="metric-value"
-              id="mining-users"
-            >
-              --
-            </strong>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Workers</span>
-            <strong
-              class="metric-value"
-              id="mining-workers"
-            >
-              --
-            </strong>
-          </article>
-
-        </div>
-
-
-        <div class="mining-section-heading">
-          <p class="eyebrow">LIVE PERFORMANCE</p>
-          <h3>Pool Hashrate</h3>
-        </div>
-
-        <div class="metric-grid mining-metric-grid">
-
-          <article class="metric-card">
-            <span class="metric-label">1 Minute</span>
-            <strong class="metric-value accent" id="mining-hashrate-1m">--</strong>
-            <span class="metric-detail">Pool hashrate</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">5 Minutes</span>
-            <strong class="metric-value" id="mining-hashrate-5m">--</strong>
-            <span class="metric-detail">Pool hashrate</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">1 Hour</span>
-            <strong class="metric-value" id="mining-hashrate-1h">--</strong>
-            <span class="metric-detail">Pool hashrate</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">6 Hours</span>
-            <strong class="metric-value" id="mining-hashrate-6h">--</strong>
-            <span class="metric-detail">Pool hashrate</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Active Workers</span>
-            <strong class="metric-value" id="mining-active-workers">--</strong>
-            <span class="metric-detail" id="mining-configured-workers">-- configured</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Pool Difficulty</span>
-            <strong class="metric-value" id="mining-pool-difficulty">--</strong>
-            <span class="metric-detail">Current share difficulty</span>
-          </article>
-
-        </div>
-
-
-        <div class="mining-section-heading">
-          <p class="eyebrow">POOL PERFORMANCE</p>
-          <h3>Shares &amp; Mining History</h3>
-        </div>
-
-        <div class="metric-grid mining-metric-grid">
-
-          <article class="metric-card">
-            <span class="metric-label">Accepted Shares</span>
-            <strong class="metric-value accent" id="mining-accepted">--</strong>
-            <span class="metric-detail">ASICseer pool counter</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">ASICseer Rejected</span>
-            <strong class="metric-value" id="mining-rejected">--</strong>
-            <span class="metric-detail">Pool-side counter</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Best Share</span>
-            <strong class="metric-value mining-number" id="mining-best-share">--</strong>
-            <span class="metric-detail">Current pool session</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">All-Time Best</span>
-            <strong class="metric-value mining-number" id="mining-best-alltime">--</strong>
-            <span class="metric-detail">Highest recorded share</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Runtime</span>
-            <strong class="metric-value" id="mining-runtime">--</strong>
-            <span class="metric-detail">ASICseer uptime</span>
-          </article>
-
-          <article class="metric-card">
-            <span class="metric-label">Block Reward</span>
-            <strong class="metric-value accent" id="mining-reward">--</strong>
-            <span class="metric-detail">Solo block reward</span>
-          </article>
-
-        </div>
-
-
-        <div class="dashboard-grid">
-
-          <article class="panel">
-
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">CONNECTIONS</p>
-                <h3>Mining Endpoints</h3>
-              </div>
+            <div class="local-node-stat">
+                <div class="mini-label">
+                    P2P
+                </div>
+                <div
+                    class="mini-value"
+                    id="umbrel-node-p2p"
+                >
+                    9333
+                </div>
             </div>
 
-            <dl class="detail-list">
+        </div>
 
-              <div>
-                <dt>Local Stratum</dt>
-                <dd id="mining-local-endpoint">
-                  This Umbrel :3336
-                </dd>
-              </div>
-
-              <div>
-                <dt>NVUN RPC</dt>
-                <dd id="mining-rpc-endpoint">
-                  nvun:9332
-                </dd>
-              </div>
-
-              <div>
-                <dt>NVUN P2P</dt>
-                <dd>
-                  TCP 9333
-                </dd>
-              </div>
-
-            </dl>
-
-          </article>
-
-
-          <article class="panel">
-
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">COMPONENTS</p>
-                <h3>ASICseer Services</h3>
-              </div>
+        <div class="local-node-state">
+            <div
+                class="node-status"
+                id="umbrel-node-online"
+            >
+                ● ONLINE
             </div>
 
-            <dl class="detail-list">
+            <div
+                class="local-node-sync"
+                id="umbrel-node-sync"
+            >
+                Synced
+            </div>
+        </div>
+    </div>
 
-              <div>
-                <dt>Connector</dt>
-                <dd id="mining-connector">--</dd>
-              </div>
 
-              <div>
-                <dt>Generator</dt>
-                <dd id="mining-generator">--</dd>
-              </div>
+    <div class="network-grid">
 
-              <div>
-                <dt>Stratifier</dt>
-                <dd id="mining-stratifier">--</dd>
-              </div>
+        <div class="node-card">
 
-            </dl>
+            <div class="node-top">
+                <div class="node-name">Node1</div>
+                <div class="node-status">● ONLINE</div>
+            </div>
 
-          </article>
+            <div class="hostname">
+                node1.nvu.us
+            </div>
 
+            <div class="node-metrics">
+
+                <div>
+                    <div class="mini-label">Software</div>
+                    <div class="mini-value">NVUN 1.0.0</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">Height</div>
+                    <div class="mini-value">—</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">P2P</div>
+                    <div class="mini-value">9333</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">Status</div>
+                    <div class="mini-value">Connected</div>
+                </div>
+
+            </div>
         </div>
 
 
-        <article class="panel">
-
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">SOLO MINING HISTORY</p>
-              <h3>Blocks Found</h3>
+        <div class="node-card">
+            <div class="node-top">
+                <div class="node-name">Node2</div>
+                <div class="node-status">● ONLINE</div>
             </div>
 
-            <span
-              class="status-pill online"
-              id="blocks-found-count"
-            >
-              Loading
+            <div class="hostname">
+                node2.nvu.us
+            </div>
+
+            <div class="node-metrics">
+
+                <div>
+                    <div class="mini-label">Software</div>
+                    <div class="mini-value">NVUN 1.0.0</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">Height</div>
+                    <div class="mini-value">—</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">P2P</div>
+                    <div class="mini-value">9333</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">Status</div>
+                    <div class="mini-value">Synced</div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="node-card">
+
+            <div class="node-top">
+                <div class="node-name">Node3</div>
+                <div class="node-status">● ONLINE</div>
+            </div>
+
+            <div class="hostname">
+                node3.nvu.us
+            </div>
+
+            <div class="node-metrics">
+
+                <div>
+                    <div class="mini-label">Software</div>
+                    <div class="mini-value">NVUN 1.0.0</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">Height</div>
+                    <div class="mini-value">—</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">P2P</div>
+                    <div class="mini-value">9333</div>
+                </div>
+
+                <div>
+                    <div class="mini-label">Status</div>
+                    <div class="mini-value">Connected</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================
+         COLLAPSIBLE PEER TABLE
+         =================================================== -->
+
+    <div class="peer-panel">
+
+        <button
+            class="peer-toggle"
+            id="peer-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="peer-content">
+
+            <span class="peer-toggle-copy">
+
+                <span class="peer-toggle-title">
+                    Connected Peers
+                </span>
+
+                <span
+                    class="peer-toggle-summary"
+                    id="peer-summary">
+
+                    <strong id="peer-count">— peers</strong>
+                    ·
+                    <span id="peer-inbound-count">— inbound</span>
+                    ·
+                    <span id="peer-outbound-count">— outbound</span>
+
+                </span>
+
             </span>
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Height</th>
-                  <th>Worker</th>
-                  <th>Found</th>
-                  <th>Effort</th>
-                  <th>Shares</th>
-                  <th>Solve Diff</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-
-              <tbody id="blocks-found-table">
-                <tr>
-                  <td colspan="7">
-                    Loading solved blocks...
-                  </td>
-                </tr>
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </article>
 
 
-        <article class="panel">
+            <span class="peer-toggle-action">
 
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">POOL ACTIVITY</p>
-              <h3>Recent ASICseer Events</h3>
-            </div>
-          </div>
+                <span id="peer-toggle-label">
+                    View Peers
+                </span>
 
-          <div
-            class="log-view"
-            id="mining-log"
-          >
-            Waiting for ASICseer activity...
-          </div>
+                <span
+                    class="peer-chevron"
+                    aria-hidden="true">
+                    ▾
+                </span>
 
-        </article>
+            </span>
 
-      </section>
-
-
-      <!-- EXPLORER -->
-
-      <section
-        class="view"
-        id="view-explorer"
-      >
-
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">NVU BLOCKCHAIN</p>
-            <h2>Block Explorer</h2>
-          </div>
-        </div>
-
-
-        <form
-          class="explorer-search"
-          id="explorer-search"
-        >
-
-          <label
-            class="sr-only"
-            for="explorer-query"
-          >
-            Search the NVU blockchain
-          </label>
-
-          <input
-            id="explorer-query"
-            name="q"
-            type="text"
-            autocomplete="off"
-            placeholder="Search block height, block hash, or transaction ID"
-          >
-
-          <button type="submit">
-            Search
-          </button>
-
-        </form>
+        </button>
 
 
         <div
-          class="explorer-result"
-          id="explorer-result"
-          aria-live="polite"
-        ></div>
+            class="peer-content"
+            id="peer-content"
+            hidden>
 
+            <div class="peer-table-wrap">
 
-        <article class="panel">
+                <table class="peer-table">
 
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">RECENT CHAIN</p>
-              <h3>Latest Blocks</h3>
+                    <thead>
+                        <tr>
+                            <th>Address</th>
+                            <th>Direction</th>
+                            <th>Version</th>
+                            <th class="peer-number">Height</th>
+                            <th class="peer-number">Received</th>
+                            <th class="peer-number">Sent</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="peer-table-body">
+
+                        <tr>
+                            <td
+                                class="peer-empty"
+                                colspan="6">
+                                Waiting for live peer data…
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
             </div>
-          </div>
 
-          <div class="table-wrap">
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Height</th>
-                  <th>Hash</th>
-                  <th>Time</th>
-                  <th>Transactions</th>
-                  <th>Size</th>
-                </tr>
-              </thead>
+            <div class="peer-footer">
 
-              <tbody id="explorer-blocks">
-                <tr>
-                  <td colspan="5">
-                    Loading blocks...
-                  </td>
-                </tr>
-              </tbody>
+                <div
+                    class="peer-page-status"
+                    id="peer-page-status"
+                    aria-live="polite">
+                    Showing 0 peers
+                </div>
+
+
+                <div class="peer-pagination">
+
+                    <button
+                        class="peer-page-button"
+                        id="peer-prev"
+                        type="button"
+                        disabled>
+                        Previous
+                    </button>
+
+                    <button
+                        class="peer-page-button"
+                        id="peer-next"
+                        type="button"
+                        disabled>
+                        Next
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+<!-- =======================================================
+     BLOCKCHAIN
+     ======================================================= -->
+
+<section id="blockchain">
+<div class="shell">
+
+    <div class="section-head">
+
+        <div>
+            <div class="section-kicker">
+                Blockchain
+            </div>
+
+            <div class="section-title">
+                Latest Blocks
+            </div>
+        </div>
+
+        <div class="section-note">
+            Loading live block data
+        </div>
+
+    </div>
+
+
+    <div class="blocks">
+
+        <div class="block-card placeholder">
+            <div>—</div>
+
+            <div>
+                Waiting for live block data…
+            </div>
+
+            <div></div>
+            <div></div>
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+<!-- =======================================================
+     NODE DETAILS
+     ======================================================= -->
+
+<section id="node">
+<div class="shell">
+
+    <div class="section-head">
+
+        <div>
+            <div class="section-kicker">
+                Local Node
+            </div>
+
+            <div class="section-title">
+                Node Details
+            </div>
+        </div>
+
+        <div class="section-note">
+            Local Node
+        </div>
+
+    </div>
+
+
+    <div class="details">
+
+        <div class="detail-card">
+
+            <div class="detail-row">
+                <div class="detail-key">Hostname</div>
+                <div class="detail-value">—</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">NVUN Version</div>
+                <div class="detail-value">1.0.0</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">Protocol</div>
+                <div class="detail-value">70016</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">Chain</div>
+                <div class="detail-value">main</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">P2P Endpoint</div>
+                <div class="detail-value">
+                    —
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">RPC Interface</div>
+                <div class="detail-value">
+                    Local only
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">Warnings</div>
+
+                <div
+                    class="detail-value"
+                    style="color:var(--green)">
+                    None
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-row">
+                <div class="detail-key">Best Block</div>
+
+                <div class="detail-value block-hash">
+                    —
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">Chainwork</div>
+
+                <div class="detail-value block-hash">
+                    —
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">
+                    Initial Block Download
+                </div>
+
+                <div class="detail-value">
+                    False
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">
+                    Network Active
+                </div>
+
+                <div class="detail-value">
+                    True
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-key">
+                    Sync Status
+                </div>
+
+                <div
+                    class="detail-value"
+                    style="color:var(--green)">
+                    Synced
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+<!-- =======================================================
+     MINING
+     ======================================================= -->
+
+<section id="mining">
+<div class="shell">
+
+    <div class="section-head">
+
+        <div>
+            <div class="section-kicker">
+                SHA-256 Solo Mining
+            </div>
+
+            <div class="section-title">
+                Mining
+            </div>
+        </div>
+
+        <div class="section-note mining-update">
+
+            <div>
+                ASICseer Solo Pool
+            </div>
+
+            <div class="last-updated">
+                Stratum
+                <span id="mining-stratum-note">
+                    TCP 3336
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="metrics">
+
+        <div class="card">
+
+            <div class="card-label">
+                Pool Status
+            </div>
+
+            <div
+                class="card-value green"
+                id="mining-pool-status"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                ASICseer mining service
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Pool Hashrate
+            </div>
+
+            <div
+                class="card-value cyan"
+                id="mining-pool-hashrate"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Current 1-minute rate
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Connected Miners
+            </div>
+
+            <div
+                class="card-value"
+                id="mining-worker-count"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Active ASICseer workers
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Pool Best Diff
+            </div>
+
+            <div
+                class="card-value cyan"
+                id="mining-best-diff"
+            >
+                —
+            </div>
+
+            <div
+                class="card-foot"
+                id="mining-best-percent"
+            >
+                Compared with network difficulty
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Network Difficulty
+            </div>
+
+            <div
+                class="card-value"
+                id="mining-network-difficulty"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Current block threshold
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Last Block Found
+            </div>
+
+            <div
+                class="card-value green"
+                id="mining-last-block-time"
+            >
+                —
+            </div>
+
+            <div
+                class="card-foot"
+                id="mining-last-block-height"
+            >
+                No retained block solves
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="summary-strip mining-summary">
+
+        <div class="summary-item">
+            ALL-TIME BEST
+            <strong id="mining-best-all-time">
+                —
+            </strong>
+        </div>
+
+        <div class="summary-item good">
+            ACCEPTED
+            <strong id="mining-accepted-shares">
+                —
+            </strong>
+        </div>
+
+        <div class="summary-item">
+            REJECTED
+            <strong id="mining-rejected-shares">
+                —
+            </strong>
+        </div>
+
+        <div class="summary-item">
+            STRATUM
+            <strong id="mining-stratum-port">
+                3336
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+
+<!-- =======================================================
+     RECENT MINING BLOCKS
+     ======================================================= -->
+
+<section id="mining-history">
+<div class="shell">
+
+    <div class="mining-block-panel">
+
+        <div class="mining-block-header">
+
+            <div>
+                <div class="peer-toggle-title">
+                    Recent Blocks Found
+                </div>
+
+                <div
+                    class="peer-toggle-summary"
+                    id="mining-block-summary"
+                >
+                    Loading recent pool solves...
+                </div>
+            </div>
+
+            <div class="mining-block-header-note">
+                5 per page
+            </div>
+
+        </div>
+
+
+        <div class="mining-block-table-wrap">
+
+            <table class="mining-block-table">
+
+                <thead>
+                    <tr>
+                        <th>Height</th>
+                        <th>Worker</th>
+                        <th>Solve Diff</th>
+                        <th>Effort</th>
+                        <th>Found</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="mining-block-table-body">
+                    <tr>
+                        <td colspan="6">
+                            Loading recent block solves...
+                        </td>
+                    </tr>
+                </tbody>
 
             </table>
 
-          </div>
-
-        </article>
-
-      </section>
-
-
-      <!-- ABOUT -->
-
-      <section
-        class="view"
-        id="view-about"
-      >
-
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">NOUVEAU-VISION</p>
-            <h2>About NVU</h2>
-          </div>
         </div>
 
 
-        <div class="dashboard-grid">
+        <div class="peer-footer mining-block-footer">
 
-          <article class="panel">
-
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">NETWORK</p>
-                <h3>Nouveau-Vision Unit</h3>
-              </div>
+            <div id="mining-block-page-status">
+                Page 1 of 1
             </div>
 
-            <dl class="detail-list">
+            <div class="peer-pagination">
 
-              <div>
-                <dt>Ticker</dt>
-                <dd>NVU</dd>
-              </div>
+                <button
+                    type="button"
+                    class="peer-page-button"
+                    id="mining-block-prev"
+                    disabled
+                >
+                    Previous
+                </button>
 
-              <div>
-                <dt>Algorithm</dt>
-                <dd>SHA-256</dd>
-              </div>
-
-              <div>
-                <dt>Node</dt>
-                <dd>NVUN</dd>
-              </div>
-
-              <div>
-                <dt>P2P Port</dt>
-                <dd>9333</dd>
-              </div>
-
-              <div>
-                <dt>Mining</dt>
-                <dd>ASICseer Solo</dd>
-              </div>
-
-              <div>
-                <dt>Stratum Port</dt>
-                <dd>3336</dd>
-              </div>
-
-            </dl>
-
-          </article>
-
-
-          <article class="panel">
-
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">APPLICATION</p>
-                <h3>NVU on Umbrel</h3>
-              </div>
-            </div>
-
-            <p class="about-copy">
-              Run an independent Nouveau-Vision Unit full node,
-              participate directly in the NVU peer-to-peer network,
-              monitor the blockchain, explore recent blocks, and
-              operate an ASICseer SHA-256 solo mining endpoint from
-              your own Umbrel.
-            </p>
-
-            <div class="link-list">
-
-              <a
-                href="https://nvu.us"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                NVU Website
-              </a>
-
-              <a
-                href="https://nouveau-vision.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Nouveau-Vision
-              </a>
-
-              <a
-                href="https://github.com/thenouveauvision/nouveau-vision-umbrel"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Source Code
-              </a>
+                <button
+                    type="button"
+                    class="peer-page-button"
+                    id="mining-block-next"
+                    disabled
+                >
+                    Next
+                </button>
 
             </div>
 
-          </article>
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+
+<!-- =======================================================
+     CONNECTED MINERS
+     ======================================================= -->
+
+<section id="connected-miners">
+<div class="shell">
+
+    <div
+        class="miners-panel"
+        id="miners-panel"
+    >
+
+        <button
+            type="button"
+            class="miners-toggle"
+            id="miners-toggle"
+            aria-expanded="false"
+            aria-controls="miners-content"
+        >
+
+            <div class="miners-toggle-copy">
+
+                <div class="peer-toggle-title">
+                    Connected Miners
+                </div>
+
+                <div
+                    class="peer-toggle-summary"
+                    id="miners-summary"
+                >
+                    Loading active miners...
+                </div>
+
+            </div>
+
+            <div class="miners-toggle-action">
+
+                <span id="miners-toggle-label">
+                    View Miners
+                </span>
+
+                <span
+                    class="miners-chevron"
+                    id="miners-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
+            </div>
+
+        </button>
+
+
+        <div
+            class="miners-content"
+            id="miners-content"
+            hidden
+        >
+
+            <div class="miners-table-wrap">
+
+                <table class="miners-table">
+
+                    <thead>
+                        <tr>
+                            <th>Worker</th>
+                            <th>Hashrate</th>
+                            <th>Last Share</th>
+                            <th>Last Block</th>
+                            <th>Best Diff</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="miners-table-body">
+
+                        <tr>
+                            <td colspan="5">
+                                Loading active miners...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="miners-note">
+                Last Block is matched against the
+                25 retained recent solves.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</section>
+
+
+
+<!-- =======================================================
+     LOCAL WALLET
+     ======================================================= -->
+
+<section id="wallet">
+<div class="shell">
+
+    <div class="section-head">
+
+        <div>
+            <div class="section-kicker">
+                Local Umbrel Wallet
+            </div>
+
+            <div class="section-title">
+                Wallet
+            </div>
+        </div>
+
+        <div class="section-note">
+
+            <div id="wallet-display-name">
+                Default Wallet
+            </div>
+
+            <div class="last-updated">
+                Read-only wallet overview
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="metrics wallet-metrics">
+
+        <div class="card">
+
+            <div class="card-label">
+                Confirmed Balance
+            </div>
+
+            <div
+                class="card-value cyan wallet-balance"
+                id="wallet-confirmed-balance"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Available confirmed funds
+            </div>
 
         </div>
 
 
-        <p class="version-line">
-          Nouveau-Vision NVU Dashboard
-          <span id="dashboard-version">0.2.2</span>
-        </p>
+        <div class="card">
 
-      </section>
+            <div class="card-label">
+                Unconfirmed
+            </div>
 
-    </main>
+            <div
+                class="card-value wallet-balance"
+                id="wallet-unconfirmed-balance"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Pending wallet funds
+            </div>
+
+        </div>
 
 
-    <footer>
-      <span>Nouveau-Vision Unit</span>
-      <span class="footer-separator">•</span>
-      <span>Run Your Node. Build the Network.</span>
-    </footer>
+        <div class="card">
 
-  </div>
+            <div class="card-label">
+                Immature
+            </div>
+
+            <div
+                class="card-value wallet-balance"
+                id="wallet-immature-balance"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Immature mining rewards
+            </div>
+
+        </div>
 
 
-  <script src="/static/app.js"></script>
+        <div class="card">
+
+            <div class="card-label">
+                Transactions
+            </div>
+
+            <div
+                class="card-value"
+                id="wallet-transaction-count"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Wallet transaction count
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Wallet Status
+            </div>
+
+            <div
+                class="card-value green"
+                id="wallet-status"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Local wallet availability
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Private Keys
+            </div>
+
+            <div
+                class="card-value"
+                id="wallet-private-keys"
+            >
+                —
+            </div>
+
+            <div class="card-foot">
+                Signing capability
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="wallet-grid">
+
+        <div class="wallet-panel">
+
+            <div class="wallet-panel-head">
+
+                <div>
+                    <div class="wallet-panel-title">
+                        Receive
+                    </div>
+
+                    <div class="wallet-panel-subtitle">
+                        Existing wallet addresses
+                    </div>
+                </div>
+
+                <div class="wallet-readonly-badge">
+                    Read Only
+                </div>
+
+            </div>
+
+
+            <div
+                class="wallet-empty-state"
+                id="wallet-address-empty"
+            >
+                <strong>No receiving address yet.</strong>
+                <br>
+                Receive functionality is planned for the next wallet update.
+            </div>
+
+
+            <div
+                class="wallet-address-list"
+                id="wallet-address-list"
+                hidden
+            >
+            </div>
+
+        </div>
+
+
+        <div class="wallet-panel">
+
+            <div class="wallet-panel-head">
+
+                <div>
+                    <div class="wallet-panel-title">
+                        Recent Transactions
+                    </div>
+
+                    <div class="wallet-panel-subtitle">
+                        Latest wallet activity
+                    </div>
+                </div>
+
+                <div
+                    class="wallet-panel-count"
+                    id="wallet-recent-count"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="wallet-transaction-wrap">
+
+                <table class="wallet-transaction-table">
+
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Confirmations</th>
+                            <th>When</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="wallet-transaction-body">
+
+                        <tr>
+                            <td colspan="4">
+                                No wallet transactions yet.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="wallet-safety-note">
+        Wallet information is displayed locally in
+        read-only mode. This dashboard does not create
+        addresses, reveal private keys, unlock the wallet,
+        or send funds.
+    </div>
+
+</div>
+</section>
+
+
+</main>
+
+
+<footer>
+<div class="shell footer-inner">
+
+    <div class="footer-brand">
+    <div>NOUVEAU-VISION UNIT • NVU</div>
+    <div class="footer-version">Dashboard v1.1.0</div>
+</div>
+
+    <div>
+        Run Your Node. Build the Network.
+    </div>
+
+</div>
+</footer>
+
+
+<!-- =======================================================
+     PEER-PANEL CONTROLLER
+     ======================================================= -->
+
+<script>
+"use strict";
+
+(() => {
+    const PAGE_SIZE = 10;
+
+    let peers = [];
+    let currentPage = 1;
+
+    const toggle = document.getElementById("peer-toggle");
+    const content = document.getElementById("peer-content");
+    const toggleLabel = document.getElementById(
+        "peer-toggle-label"
+    );
+
+    const tableBody = document.getElementById(
+        "peer-table-body"
+    );
+
+    const countElement = document.getElementById(
+        "peer-count"
+    );
+
+    const inboundElement = document.getElementById(
+        "peer-inbound-count"
+    );
+
+    const outboundElement = document.getElementById(
+        "peer-outbound-count"
+    );
+
+    const pageStatus = document.getElementById(
+        "peer-page-status"
+    );
+
+    const previousButton = document.getElementById(
+        "peer-prev"
+    );
+
+    const nextButton = document.getElementById(
+        "peer-next"
+    );
+
+
+    function formatInteger(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return "—";
+        }
+
+        return new Intl.NumberFormat("en-US", {
+            maximumFractionDigits: 0
+        }).format(number);
+    }
+
+
+    function formatBytes(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number)) {
+            return "—";
+        }
+
+        const units = [
+            "B",
+            "KB",
+            "MB",
+            "GB",
+            "TB"
+        ];
+
+        let current = number;
+        let index = 0;
+
+        while (
+            current >= 1024 &&
+            index < units.length - 1
+        ) {
+            current /= 1024;
+            index += 1;
+        }
+
+        const decimals =
+            index === 0
+                ? 0
+                : current >= 100
+                    ? 0
+                    : current >= 10
+                        ? 1
+                        : 2;
+
+        return (
+            current.toFixed(decimals) +
+            " " +
+            units[index]
+        );
+    }
+
+
+    function cleanVersion(value) {
+        if (!value) {
+            return "Unknown";
+        }
+
+        return String(value)
+            .replace(/^\/+|\/+$/g, "")
+            .replace(/^NVUN:/i, "NVUN ");
+    }
+
+
+    function formatPeerAddress(value) {
+        const address =
+            String(value || "").trim();
+
+        if (!address) {
+            return "Unknown";
+        }
+
+        const knownPeers = [
+            {
+                hostname: "node1.nvu.us",
+                aliases: [
+                    "node1.nvu.us",
+                    "node.nvu.us",
+                    "72.167.46.0"
+                ]
+            },
+            {
+                hostname: "node2.nvu.us",
+                aliases: [
+                    "node2.nvu.us",
+                    "50.62.183.2"
+                ]
+            },
+            {
+                hostname: "node3.nvu.us",
+                aliases: [
+                    "node3.nvu.us",
+                    "132.148.79.57"
+                ]
+            }
+        ];
+
+        for (const peer of knownPeers) {
+            const matched =
+                peer.aliases.some(
+                    alias =>
+                        address === alias ||
+                        address.startsWith(
+                            `${alias}:`
+                        )
+                );
+
+            if (matched) {
+                return peer.hostname;
+            }
+        }
+
+        return address;
+    }
+
+
+    function createCell(textValue, className = "") {
+        const cell = document.createElement("td");
+
+        if (className) {
+            cell.className = className;
+        }
+
+        cell.textContent = textValue;
+        return cell;
+    }
+
+
+    function renderPeers() {
+        tableBody.replaceChildren();
+
+        const total = peers.length;
+        const totalPages = Math.max(
+            1,
+            Math.ceil(total / PAGE_SIZE)
+        );
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        if (total === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.className = "peer-empty";
+            cell.colSpan = 6;
+            cell.textContent =
+                "No connected peers are currently available.";
+
+            row.appendChild(cell);
+            tableBody.appendChild(row);
+
+            pageStatus.textContent = "Showing 0 peers";
+
+            previousButton.disabled = true;
+            nextButton.disabled = true;
+
+            return;
+        }
+
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const end = Math.min(start + PAGE_SIZE, total);
+
+        const pagePeers = peers.slice(start, end);
+
+        for (const peer of pagePeers) {
+            const row = document.createElement("tr");
+
+            const address = createCell(
+                formatPeerAddress(
+                    peer.address ||
+                    peer.addr ||
+                    "Unknown"
+                ),
+                "peer-address"
+            );
+
+            const directionCell = document.createElement("td");
+            const directionBadge = document.createElement(
+                "span"
+            );
+
+            const inbound = Boolean(peer.inbound);
+
+            directionBadge.className =
+                "peer-direction " +
+                (inbound ? "inbound" : "outbound");
+
+            directionBadge.textContent =
+                inbound ? "INBOUND" : "OUTBOUND";
+
+            directionCell.appendChild(directionBadge);
+
+            const version = createCell(
+                cleanVersion(
+                    peer.version ||
+                    peer.subversion ||
+                    peer.subver
+                )
+            );
+
+            const height = createCell(
+                formatInteger(
+                    peer.height ??
+                    peer.synced_blocks ??
+                    peer.starting_height
+                ),
+                "peer-number"
+            );
+
+            const received = createCell(
+                formatBytes(
+                    peer.bytes_received ??
+                    peer.bytesrecv
+                ),
+                "peer-number"
+            );
+
+            const sent = createCell(
+                formatBytes(
+                    peer.bytes_sent ??
+                    peer.bytessent
+                ),
+                "peer-number"
+            );
+
+            row.append(
+                address,
+                directionCell,
+                version,
+                height,
+                received,
+                sent
+            );
+
+            tableBody.appendChild(row);
+        }
+
+        pageStatus.textContent =
+            `Showing ${start + 1}–${end} of ${total} peers ` +
+            `· Page ${currentPage} of ${totalPages}`;
+
+        previousButton.disabled = currentPage <= 1;
+        nextButton.disabled = currentPage >= totalPages;
+    }
+
+
+    function updatePeerSummary() {
+        const inbound = peers.filter(
+            peer => Boolean(peer.inbound)
+        ).length;
+
+        const outbound = peers.length - inbound;
+
+        countElement.textContent =
+            `${peers.length} ` +
+            `${peers.length === 1 ? "peer" : "peers"}`;
+
+        inboundElement.textContent =
+            `${inbound} inbound`;
+
+        outboundElement.textContent =
+            `${outbound} outbound`;
+    }
+
+
+    function setPeers(newPeers) {
+        peers = Array.isArray(newPeers)
+            ? newPeers.slice()
+            : [];
+
+        const totalPages = Math.max(
+            1,
+            Math.ceil(
+                peers.length / PAGE_SIZE
+            )
+        );
+
+        currentPage = Math.min(
+            currentPage,
+            totalPages
+        );
+
+        updatePeerSummary();
+        renderPeers();
+    }
+
+
+    function togglePanel() {
+        const expanded =
+            toggle.getAttribute("aria-expanded") === "true";
+
+        const nextExpanded = !expanded;
+
+        toggle.setAttribute(
+            "aria-expanded",
+            String(nextExpanded)
+        );
+
+        content.hidden = !nextExpanded;
+
+        toggleLabel.textContent =
+            nextExpanded
+                ? "Hide Peers"
+                : "View Peers";
+
+        if (nextExpanded) {
+            renderPeers();
+        }
+    }
+
+
+    toggle.addEventListener("click", togglePanel);
+
+
+    previousButton.addEventListener(
+        "click",
+        () => {
+            if (currentPage > 1) {
+                currentPage -= 1;
+                renderPeers();
+            }
+        }
+    );
+
+
+    nextButton.addEventListener(
+        "click",
+        () => {
+            const totalPages = Math.max(
+                1,
+                Math.ceil(peers.length / PAGE_SIZE)
+            );
+
+            if (currentPage < totalPages) {
+                currentPage += 1;
+                renderPeers();
+            }
+        }
+    );
+
+
+    /*
+     * dashboard.js can populate the panel with:
+     *
+     * window.NVUPeers.setData(data.peers);
+     */
+
+    window.NVUPeers = {
+        setData: setPeers,
+        refresh: renderPeers,
+        getData: () => peers.slice()
+    };
+
+    renderPeers();
+})();
+</script>
+
 
 </body>
 </html>
