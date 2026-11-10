@@ -3,6 +3,7 @@ set -eu
 
 CREDENTIAL_DIR=/home/ubuntu/credentials
 PASSWORD_FILE="$CREDENTIAL_DIR/rpcpassword"
+PAYOUT_FILE="$CREDENTIAL_DIR/mining-payout-address"
 CONFIG_FILE=/home/ubuntu/nvu-pool.conf
 
 attempt=0
@@ -21,6 +22,36 @@ done
 
 RPCPASSWORD=$(cat "$PASSWORD_FILE")
 
+if [ -z "$RPCPASSWORD" ]; then
+    echo "ERROR: NVUN RPC credential is empty."
+    exit 1
+fi
+
+if [ ! -s "$PAYOUT_FILE" ]; then
+    echo "ERROR: Mining payout address was not initialized."
+    exit 1
+fi
+
+MINING_PAYOUT_ADDRESS=$(
+    tr -d '\r\n' < "$PAYOUT_FILE"
+)
+
+if [ -z "$MINING_PAYOUT_ADDRESS" ]; then
+    echo "ERROR: Mining payout address is empty."
+    exit 1
+fi
+
+case "$MINING_PAYOUT_ADDRESS" in
+    nvu:*)
+        ;;
+    *)
+        echo "ERROR: Mining payout address has an invalid NVU prefix."
+        exit 1
+        ;;
+esac
+
+echo "Mining payout address: $MINING_PAYOUT_ADDRESS"
+
 umask 077
 
 cat > "$CONFIG_FILE" <<CONFIG
@@ -34,7 +65,7 @@ cat > "$CONFIG_FILE" <<CONFIG
       "zmq": "tcp://nvun:29332"
     }
   ],
-  "bchaddress": "nvu:qqez4ylvjjey6wwqkza4m5z95fn8u4slcqt3yflx39",
+  "bchaddress": "$MINING_PAYOUT_ADDRESS",
   "serverurl": [
     "0.0.0.0:3335"
   ],

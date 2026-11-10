@@ -99,7 +99,7 @@ def status():
             "sizeOnDisk": blockchain.get(
                 "size_on_disk"
             ),
-            "version": network.get("subversion"),
+            "version": "1.0.1",
             "protocolVersion": network.get(
                 "protocolversion"
             ),
@@ -351,10 +351,15 @@ def wallet_addresses():
 @app.route("/api/mining")
 def mining():
     pool = asicseer.status()
+    payout_address = (
+        rpc.mining_payout_address()
+    )
 
     return jsonify({
         "ok": True,
         "asicseer": pool,
+        "payoutAddress":
+            payout_address,
         "stratumPort": int(
             os.getenv(
                 "ASICSEER_STRATUM_PORT",
@@ -719,7 +724,7 @@ def search():
 def version():
     return jsonify({
         "ok": True,
-        "dashboardVersion": "0.2.2",
+        "dashboardVersion": "1.2.0",
         "project": "Nouveau-Vision Unit",
         "ticker": "NVU",
     })

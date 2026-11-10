@@ -8,7 +8,7 @@ services:
       - default
 
   dashboard:
-    image: ghcr.io/thenouveauvision/nouveau-vision-dashboard:1.1.0
+    image: ghcr.io/thenouveauvision/nouveau-vision-dashboard:1.2.0
     restart: unless-stopped
     init: true
 
@@ -54,7 +54,7 @@ services:
       - ALL
 
   nvun:
-    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:1.0.0
+    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:1.0.1
     container_name: nouveau-vision-nvun
     restart: unless-stopped
 
@@ -79,14 +79,42 @@ services:
         aliases:
           - nvun
 
+  mining_wallet_init:
+    image: ghcr.io/thenouveauvision/nouveau-vision-nvun:1.0.1
+    container_name: nouveau-vision-mining-wallet-init
+    user: "1000:1000"
+    restart: "no"
+
+    depends_on:
+      nvun:
+        condition: service_healthy
+
+    entrypoint:
+      - /usr/local/bin/mining-wallet-init
+
+    volumes:
+      - nvu-credentials:/home/nvu/credentials
+
+    networks:
+      - nvu-network
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
   asicseer:
-    image: ghcr.io/thenouveauvision/nouveau-vision-asicseer:0.2.0
+    image: ghcr.io/thenouveauvision/nouveau-vision-asicseer:1.0.0
     container_name: nouveau-vision-asicseer
     restart: unless-stopped
 
     depends_on:
       nvun:
         condition: service_healthy
+
+      mining_wallet_init:
+        condition: service_completed_successfully
 
     volumes:
       - nvu-credentials:/home/ubuntu/credentials:ro

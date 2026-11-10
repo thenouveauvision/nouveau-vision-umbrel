@@ -22,11 +22,13 @@ RUN apt-get update && \
 COPY --chown=1000:1000 binaries/src/nvund /usr/local/bin/nvund
 COPY --chown=1000:1000 binaries/src/nvu-cli /usr/local/bin/nvu-cli
 COPY --chown=1000:1000 entrypoint.sh /usr/local/bin/nvu-entrypoint
+COPY --chown=1000:1000 mining-wallet-init.sh /usr/local/bin/mining-wallet-init
 
 RUN chmod 0755 \
         /usr/local/bin/nvund \
         /usr/local/bin/nvu-cli \
-        /usr/local/bin/nvu-entrypoint && \
+        /usr/local/bin/nvu-entrypoint \
+        /usr/local/bin/mining-wallet-init && \
     mkdir -p \
         /home/nvu/.nvu \
         /home/nvu/credentials && \

@@ -18,6 +18,8 @@ class NVURPC:
             os.getenv("NVUN_CREDENTIALS_DIR", "/run/nvu-credentials")
         )
 
+        self.credentials_dir = credentials_dir
+
         password_file = credentials_dir / "rpcpassword"
 
         if not password_file.is_file():
@@ -93,6 +95,28 @@ class NVURPC:
 
     def uptime(self):
         return self.call("uptime")
+
+    def mining_payout_address(self):
+        payout_file = (
+            self.credentials_dir
+            / "mining-payout-address"
+        )
+
+        if not payout_file.is_file():
+            return None
+
+        try:
+            address = payout_file.read_text(
+                encoding="utf-8"
+            ).strip()
+
+        except OSError:
+            return None
+
+        if not address.startswith("nvu:"):
+            return None
+
+        return address
 
     def list_wallets(self):
         return self.call(

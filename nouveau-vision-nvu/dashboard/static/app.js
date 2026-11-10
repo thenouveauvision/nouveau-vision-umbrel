@@ -1006,7 +1006,7 @@ setText(
         );
 
         setDetail(
-            "NVUN Version",
+            "NVUN",
             node.version
         );
 
@@ -1662,6 +1662,19 @@ function updateMiningMetrics(
         ),
         `TCP ${stratumPort}`
     );
+
+    const payoutAddress =
+        typeof miningResult.payoutAddress === "string"
+            && miningResult.payoutAddress.startsWith("nvu:")
+                ? miningResult.payoutAddress
+                : "Not initialized";
+
+    setText(
+        document.getElementById(
+            "mining-payout-address"
+        ),
+        payoutAddress
+    );
 }
 
 
@@ -2302,7 +2315,7 @@ function formatNVUAmount(value) {
         number.toLocaleString(
             "en-US",
             {
-                minimumFractionDigits: 8,
+                minimumFractionDigits: 0,
                 maximumFractionDigits: 8
             }
         )
