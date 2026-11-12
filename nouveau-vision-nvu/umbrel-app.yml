@@ -4,7 +4,7 @@ name: Nouveau-Vision NVU
 tagline: Run an NVU full node and solo mining pool on Umbrel
 icon: https://nvu.us/nvu-umbrel-app-icon.png
 category: bitcoin
-version: "1.2.0"
+version: "1.2.1"
 port: 3340
 
 description: >-
@@ -25,8 +25,8 @@ releaseNotes: >-
   Adds automatic local NVU wallet integration for solo mining,
   including a persistent pool operator address tied to the Umbrel
   NVUN wallet. Adds transparent mining payout information, improved
-  wallet balances and transaction formatting, NVUN 1.0.1,
-  ASICseer-NVU 1.0.0, and Dashboard 1.2.0.
+  wallet balances and transaction formatting, NVUN 1.0.0,
+  ASICseer-NVU 1.0.0, and Dashboard 1.2.1.
 dependencies: []
 path: ""
 defaultUsername: ""

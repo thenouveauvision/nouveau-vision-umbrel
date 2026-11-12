@@ -29,9 +29,9 @@ The app includes:
 
 | Component | Version |
 |---|---:|
-| Nouveau-Vision Umbrel App | 1.2.0 |
-| NVUN | 1.0.1 |
-| NVU Dashboard | 1.2.0 |
+| Nouveau-Vision Umbrel App | 1.2.1 |
+| NVUN | 1.0.0 |
+| NVU Dashboard | 1.2.1 |
 | ASICseer-NVU | 1.0.0 |
 
 ---

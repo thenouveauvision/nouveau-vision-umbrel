@@ -1,0 +1,2 @@
+nouveau-vision-nvu/docker/nvun/binaries/src/nvund filter=lfs diff=lfs merge=lfs -text
+nouveau-vision-nvu/docker/nvun/binaries/src/nvu-cli filter=lfs diff=lfs merge=lfs -text

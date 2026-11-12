@@ -1107,6 +1107,75 @@ main > section:first-child {
    DETAILS
    ========================================================= */
 
+.node-details-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    gap: 20px;
+    padding: 0 0 18px;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.node-details-toggle:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.node-details-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
+}
+
+.node-details-toggle-copy {
+    min-width: 0;
+}
+
+.node-details-toggle-side {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.node-details-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--cyan);
+
+    font-size: 10px;
+    font-weight: 750;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.node-details-chevron {
+    display: inline-block;
+
+    font-size: 15px;
+    line-height: 1;
+
+    transition: transform .18s ease;
+}
+
+.node-details-toggle[aria-expanded="true"]
+.node-details-chevron {
+    transform: rotate(180deg);
+}
+
+.node-details-content {
+    width: 100%;
+}
+
 .details {
     display: grid;
     grid-template-columns: 1.15fr .85fr;
@@ -1165,6 +1234,75 @@ main > section:first-child {
    BLOCKS
    ========================================================= */
 
+.latest-blocks-panel {
+    overflow: hidden;
+}
+
+.latest-blocks-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    gap: 20px;
+    padding: 0 0 18px;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.latest-blocks-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
+}
+
+.latest-blocks-toggle-copy {
+    min-width: 0;
+}
+
+.latest-blocks-toggle-side {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.latest-blocks-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--cyan);
+
+    font-size: 10px;
+    font-weight: 750;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.latest-blocks-chevron {
+    display: inline-block;
+
+    font-size: 15px;
+    line-height: 1;
+
+    transition: transform .18s ease;
+}
+
+.latest-blocks-toggle[aria-expanded="true"]
+.latest-blocks-chevron {
+    transform: rotate(180deg);
+}
+
+.latest-blocks-content .peer-footer {
+    margin-top: 8px;
+}
+
 .blocks {
     display: grid;
     gap: 8px;
@@ -1217,16 +1355,53 @@ footer {
 }
 
 .footer-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
 
+    align-items: center;
     gap: 25px;
 }
 
 .footer-brand {
+    justify-self: start;
+
     color: #879aaa;
     letter-spacing: .05em;
+}
+
+.back-to-top {
+    justify-self: center;
+}
+
+.footer-tagline {
+    justify-self: end;
+    text-align: right;
+}
+
+.back-to-top {
+    color: var(--cyan);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: .06em;
+    text-decoration: none;
+    white-space: nowrap;
+
+    opacity: .78;
+    transition: opacity .15s ease;
+}
+
+.back-to-top:hover {
+    opacity: 1;
+}
+
+.back-to-top:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 4px;
 }
 
 .footer-version {
@@ -1257,6 +1432,22 @@ footer {
    ========================================================= */
 
 @media (max-width: 800px) {
+    .footer-inner {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+
+    .footer-brand,
+    .back-to-top,
+    .footer-tagline {
+        justify-self: center;
+    }
+
+    .footer-tagline {
+        text-align: center;
+    }
+
     :root {
         --header-height: 68px;
         --context-height: 40px;
@@ -1422,6 +1613,30 @@ footer {
     }
 }
 
+.mining-payout-address-line {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+#mining-payout-address {
+    min-width: 0;
+
+    color: var(--cyan);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Consolas,
+        monospace;
+
+    overflow-wrap: anywhere;
+}
+
+
 /* =========================================================
    RECENT MINING BLOCKS
    ========================================================= */
@@ -1451,28 +1666,70 @@ footer {
     backdrop-filter: blur(10px);
 }
 
-.mining-block-header {
+.mining-block-toggle {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
+    width: 100%;
     gap: 20px;
     min-height: 76px;
     padding: 17px 20px;
 
-    border-bottom: 1px solid var(--border);
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
 }
 
-.mining-block-header-note {
-    color: #647b8d;
+.mining-block-toggle:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.mining-block-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: -2px;
+}
+
+.mining-block-toggle-copy {
+    min-width: 0;
+}
+
+.mining-block-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--cyan);
 
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 750;
 
     letter-spacing: .08em;
     text-transform: uppercase;
     white-space: nowrap;
 }
+
+.mining-block-chevron {
+    display: inline-block;
+
+    font-size: 15px;
+    line-height: 1;
+
+    transition: transform .18s ease;
+}
+
+.mining-block-toggle[aria-expanded="true"]
+.mining-block-chevron {
+    transform: rotate(180deg);
+}
+
+.mining-block-content {
+    border-top: 1px solid var(--border);
+}
+
 
 .mining-block-table-wrap {
     width: 100%;
@@ -1562,15 +1819,12 @@ footer {
 }
 
 @media (max-width: 620px) {
-    .mining-block-header {
+    .mining-block-toggle {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
     }
 
-    .mining-block-header-note {
-        white-space: normal;
-    }
 }
 
 
@@ -1841,12 +2095,6 @@ footer {
     text-transform: uppercase;
 }
 
-.wallet-panel-count {
-    color: var(--cyan);
-
-    font-size: 18px;
-    font-weight: 650;
-}
 
 .wallet-empty-state {
     min-height: 140px;
@@ -1885,6 +2133,69 @@ footer {
 
     color: #647b8d;
     font-size: 10px;
+}
+
+.wallet-transaction-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    gap: 20px;
+    padding: 17px 20px;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.wallet-transaction-toggle:hover {
+    background: rgba(67,216,255,.035);
+}
+
+.wallet-transaction-toggle:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: -2px;
+}
+
+.wallet-transaction-toggle-copy {
+    min-width: 0;
+}
+
+.wallet-transaction-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--cyan);
+
+    font-size: 10px;
+    font-weight: 750;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.wallet-transaction-chevron {
+    display: inline-block;
+
+    font-size: 15px;
+    line-height: 1;
+
+    transition: transform .18s ease;
+}
+
+.wallet-transaction-toggle[aria-expanded="true"]
+.wallet-transaction-chevron {
+    transform: rotate(180deg);
+}
+
+.wallet-transaction-content {
+    border-top: 1px solid var(--border);
 }
 
 .wallet-transaction-wrap {
@@ -1928,6 +2239,10 @@ footer {
 .wallet-transaction-table
 tbody tr:last-child td {
     border-bottom: 0;
+}
+
+.wallet-transaction-footer {
+    border-top: 1px solid rgba(67,216,255,.08);
 }
 
 .wallet-amount-positive {
@@ -2008,7 +2323,7 @@ tbody tr:last-child td {
         <strong>NETWORK OVERVIEW</strong>
         <span id="context-node-name">NVU Node</span>
         <span id="context-node-hostname">Local Node</span>
-        <span>NVUN 1.0.1</span>
+        <span>NVUN 1.0.0</span>
     </div>
 
     <div class="context-health">
@@ -2065,7 +2380,7 @@ tbody tr:last-child td {
 
         <div class="summary-item">
             SOFTWARE
-            <strong>NVUN 1.0.1</strong>
+            <strong>NVUN 1.0.0</strong>
         </div>
 
         <div class="summary-item">
@@ -2258,7 +2573,7 @@ tbody tr:last-child td {
 
                 <div>
                     <div class="mini-label">Software</div>
-                    <div class="mini-value">NVUN 1.0.1</div>
+                    <div class="mini-value">NVUN 1.0.0</div>
                 </div>
 
                 <div>
@@ -2294,7 +2609,7 @@ tbody tr:last-child td {
 
                 <div>
                     <div class="mini-label">Software</div>
-                    <div class="mini-value">NVUN 1.0.1</div>
+                    <div class="mini-value">NVUN 1.0.0</div>
                 </div>
 
                 <div>
@@ -2331,7 +2646,7 @@ tbody tr:last-child td {
 
                 <div>
                     <div class="mini-label">Software</div>
-                    <div class="mini-value">NVUN 1.0.1</div>
+                    <div class="mini-value">NVUN 1.0.0</div>
                 </div>
 
                 <div>
@@ -2490,36 +2805,120 @@ tbody tr:last-child td {
 <section id="blockchain">
 <div class="shell">
 
-    <div class="section-head">
+    <div
+        class="latest-blocks-panel"
+        id="latest-blocks-panel"
+    >
 
-        <div>
-            <div class="section-kicker">
-                Blockchain
+        <button
+            type="button"
+            class="latest-blocks-toggle"
+            id="latest-blocks-toggle"
+            aria-expanded="true"
+            aria-controls="latest-blocks-content"
+        >
+
+            <div class="latest-blocks-toggle-copy">
+
+                <div class="section-kicker">
+                    Blockchain
+                </div>
+
+                <div class="section-title">
+                    Latest Blocks
+                </div>
+
             </div>
 
-            <div class="section-title">
-                Latest Blocks
+            <div class="latest-blocks-toggle-side">
+
+                <div
+                    class="section-note"
+                    id="latest-blocks-updated"
+                >
+                    Loading live block data
+                </div>
+
+                <div class="latest-blocks-toggle-action">
+
+                    <span id="latest-blocks-toggle-label">
+                        Hide Blocks
+                    </span>
+
+                    <span
+                        class="latest-blocks-chevron"
+                        aria-hidden="true"
+                    >
+                        ▾
+                    </span>
+
+                </div>
+
             </div>
-        </div>
 
-        <div class="section-note">
-            Loading live block data
-        </div>
-
-    </div>
+        </button>
 
 
-    <div class="blocks">
+        <div
+            class="latest-blocks-content"
+            id="latest-blocks-content"
+        >
 
-        <div class="block-card placeholder">
-            <div>—</div>
+            <div class="blocks">
 
-            <div>
-                Waiting for live block data…
+                <div class="block-card placeholder">
+                    <div>—</div>
+
+                    <div>
+                        Waiting for live block data…
+                    </div>
+
+                    <div></div>
+                    <div></div>
+                </div>
+
             </div>
 
-            <div></div>
-            <div></div>
+
+            <div
+                class="peer-footer"
+                id="latest-blocks-footer"
+                hidden
+            >
+
+                <div
+                    class="peer-page-status"
+                    id="latest-blocks-page-status"
+                    aria-live="polite"
+                >
+                    Showing 0 blocks
+                </div>
+
+
+                <div class="peer-pagination">
+
+                    <button
+                        class="peer-page-button"
+                        id="latest-blocks-prev"
+                        type="button"
+                        disabled
+                    >
+                        Previous
+                    </button>
+
+                    <button
+                        class="peer-page-button"
+                        id="latest-blocks-next"
+                        type="button"
+                        disabled
+                    >
+                        Next
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -2535,9 +2934,16 @@ tbody tr:last-child td {
 <section id="node">
 <div class="shell">
 
-    <div class="section-head">
+    <button
+        type="button"
+        class="node-details-toggle"
+        id="node-details-toggle"
+        aria-expanded="false"
+        aria-controls="node-details-content"
+    >
 
-        <div>
+        <div class="node-details-toggle-copy">
+
             <div class="section-kicker">
                 Local Node
             </div>
@@ -2545,14 +2951,40 @@ tbody tr:last-child td {
             <div class="section-title">
                 Node Details
             </div>
+
         </div>
 
-        <div class="section-note">
-            Local Node
+        <div class="node-details-toggle-side">
+
+            <div class="section-note">
+                Local Node
+            </div>
+
+            <div class="node-details-toggle-action">
+
+                <span id="node-details-toggle-label">
+                    View Details
+                </span>
+
+                <span
+                    class="node-details-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
+            </div>
+
         </div>
 
-    </div>
+    </button>
 
+
+    <div
+        class="node-details-content"
+        id="node-details-content"
+        hidden
+    >
 
     <div class="details">
 
@@ -2565,7 +2997,7 @@ tbody tr:last-child td {
 
             <div class="detail-row">
                 <div class="detail-key">NVUN</div>
-                <div class="detail-value">1.0.1</div>
+                <div class="detail-value">1.0.0</div>
             </div>
 
             <div class="detail-row">
@@ -2656,6 +3088,8 @@ tbody tr:last-child td {
             </div>
 
         </div>
+
+    </div>
 
     </div>
 
@@ -2870,28 +3304,12 @@ tbody tr:last-child td {
             class="summary-item"
             style="width:100%"
         >
-            POOL OPERATOR ADDRESS
-
-            <strong>
-                Local NVUN Wallet
-            </strong>
-
-            <span
-                id="mining-payout-address"
-                style="
-                    display:block;
-                    margin-top:4px;
-                    color:var(--cyan);
-                    font-family:
-                        ui-monospace,
-                        SFMono-Regular,
-                        Consolas,
-                        monospace;
-                    overflow-wrap:anywhere;
-                "
-            >
-                Not initialized
-            </span>
+            <div class="mining-payout-address-line">
+                <span>POOL OPERATOR ADDRESS:</span>
+                <span id="mining-payout-address">
+                    Not initialized
+                </span>
+            </div>
             <span
                 style="
                     display:block;
@@ -2934,9 +3352,16 @@ tbody tr:last-child td {
 
     <div class="mining-block-panel">
 
-        <div class="mining-block-header">
+        <button
+            type="button"
+            class="mining-block-toggle"
+            id="mining-block-toggle"
+            aria-expanded="true"
+            aria-controls="mining-block-content"
+        >
 
-            <div>
+            <div class="mining-block-toggle-copy">
+
                 <div class="peer-toggle-title">
                     Recent Blocks Found
                 </div>
@@ -2947,14 +3372,31 @@ tbody tr:last-child td {
                 >
                     Loading recent pool solves...
                 </div>
+
             </div>
 
-            <div class="mining-block-header-note">
-                5 per page
+            <div class="mining-block-toggle-action">
+
+                <span id="mining-block-toggle-label">
+                    Hide Blocks
+                </span>
+
+                <span
+                    class="mining-block-chevron"
+                    aria-hidden="true"
+                >
+                    ▾
+                </span>
+
             </div>
 
-        </div>
+        </button>
 
+
+        <div
+            class="mining-block-content"
+            id="mining-block-content"
+        >
 
         <div class="mining-block-table-wrap">
 
@@ -3011,6 +3453,8 @@ tbody tr:last-child td {
                 </button>
 
             </div>
+
+        </div>
 
         </div>
 
@@ -3327,27 +3771,50 @@ tbody tr:last-child td {
 
         <div class="wallet-panel">
 
-            <div class="wallet-panel-head">
+            <button
+                type="button"
+                class="wallet-transaction-toggle"
+                id="wallet-transaction-toggle"
+                aria-expanded="true"
+                aria-controls="wallet-transaction-content"
+            >
 
-                <div>
+                <div class="wallet-transaction-toggle-copy">
+
                     <div class="wallet-panel-title">
                         Recent Transactions
                     </div>
 
                     <div class="wallet-panel-subtitle">
-                        Latest wallet activity
+                        Latest wallet activity ·
+                        <span id="wallet-recent-count">0</span>
+                        retained
                     </div>
+
                 </div>
 
-                <div
-                    class="wallet-panel-count"
-                    id="wallet-recent-count"
-                >
-                    0
+                <div class="wallet-transaction-toggle-action">
+
+                    <span id="wallet-transaction-toggle-label">
+                        Hide Transactions
+                    </span>
+
+                    <span
+                        class="wallet-transaction-chevron"
+                        aria-hidden="true"
+                    >
+                        ▾
+                    </span>
+
                 </div>
 
-            </div>
+            </button>
 
+
+            <div
+                class="wallet-transaction-content"
+                id="wallet-transaction-content"
+            >
 
             <div class="wallet-transaction-wrap">
 
@@ -3376,6 +3843,46 @@ tbody tr:last-child td {
 
             </div>
 
+            <div
+                class="peer-footer wallet-transaction-footer"
+                id="wallet-transaction-footer"
+                hidden
+            >
+
+                <div
+                    class="peer-page-status"
+                    id="wallet-transaction-page-status"
+                    aria-live="polite"
+                >
+                    Showing 0 transactions
+                </div>
+
+                <div class="peer-pagination">
+
+                    <button
+                        type="button"
+                        class="peer-page-button"
+                        id="wallet-transaction-prev"
+                        disabled
+                    >
+                        Previous
+                    </button>
+
+                    <button
+                        type="button"
+                        class="peer-page-button"
+                        id="wallet-transaction-next"
+                        disabled
+                    >
+                        Next
+                    </button>
+
+                </div>
+
+            </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -3400,10 +3907,17 @@ tbody tr:last-child td {
 
     <div class="footer-brand">
     <div>NOUVEAU-VISION UNIT • NVU</div>
-    <div class="footer-version">Dashboard 1.2.0</div>
+    <div class="footer-version">Dashboard 1.2.1</div>
 </div>
 
-    <div>
+    <a
+        class="back-to-top"
+        href="#overview"
+    >
+        Back to Top ↑
+    </a>
+
+    <div class="footer-tagline">
         Run Your Node. Build the Network.
     </div>
 
@@ -3419,7 +3933,7 @@ tbody tr:last-child td {
 "use strict";
 
 (() => {
-    const PAGE_SIZE = 10;
+    const PAGE_SIZE = 5;
 
     let peers = [];
     let currentPage = 1;

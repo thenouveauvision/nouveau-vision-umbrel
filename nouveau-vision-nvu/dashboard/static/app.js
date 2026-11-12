@@ -12,7 +12,7 @@
         "/api/peers";
 
     const BLOCKS_API =
-        "/api/blocks/latest?limit=5";
+        "/api/blocks/latest?limit=25";
 
     const MINING_API =
         "/api/mining";
@@ -27,7 +27,7 @@
         "/api/wallet/status";
 
     const WALLET_TRANSACTIONS_API =
-        "/api/wallet/transactions?limit=10";
+        "/api/wallet/transactions?limit=25";
 
     const WALLET_ADDRESSES_API =
         "/api/wallet/addresses";
@@ -36,10 +36,22 @@
 
     let refreshTimer = null;
 
+    const LATEST_BLOCKS_PAGE_SIZE = 5;
+    const LATEST_BLOCKS_LIMIT = 25;
+
+    let latestBlocks = [];
+    let latestBlocksPage = 1;
+
     const MINING_BLOCKS_PAGE_SIZE = 5;
 
     let miningBlocks = [];
     let miningBlocksPage = 1;
+
+    const WALLET_TRANSACTIONS_PAGE_SIZE = 5;
+    const WALLET_TRANSACTIONS_LIMIT = 25;
+
+    let walletTransactions = [];
+    let walletTransactionsPage = 1;
 
 
     /* =====================================================
@@ -114,7 +126,7 @@ function updateLastUpdated(timestamp) {
         }
 
         if (number >= 1e9) {
-            return `${(number / 1e9).toFixed(2)}B`;
+            return `${(number / 1e9).toFixed(2)}G`;
         }
 
         if (number >= 1e6) {
@@ -552,22 +564,52 @@ setText(
        LATEST BLOCKS
        ===================================================== */
 
-    function updateLatestBlocks(blocks) {
+    function renderLatestBlocks() {
         const container =
             document.querySelector(
                 ".blocks"
             );
 
-        if (
-            !container ||
-            !Array.isArray(blocks)
-        ) {
+        if (!container) {
             return;
         }
 
+        const totalBlocks =
+            latestBlocks.length;
+
+        const totalPages =
+            Math.max(
+                1,
+                Math.ceil(
+                    totalBlocks /
+                    LATEST_BLOCKS_PAGE_SIZE
+                )
+            );
+
+        latestBlocksPage =
+            Math.min(
+                Math.max(
+                    latestBlocksPage,
+                    1
+                ),
+                totalPages
+            );
+
+        const start =
+            (
+                latestBlocksPage - 1
+            ) * LATEST_BLOCKS_PAGE_SIZE;
+
+        const visibleBlocks =
+            latestBlocks.slice(
+                start,
+                start +
+                LATEST_BLOCKS_PAGE_SIZE
+            );
+
         container.replaceChildren();
 
-        if (blocks.length === 0) {
+        if (visibleBlocks.length === 0) {
             const row =
                 document.createElement(
                     "div"
@@ -581,88 +623,171 @@ setText(
 
             container.appendChild(row);
 
+        } else {
+            for (const block of visibleBlocks) {
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.className =
+                    "block-card";
+
+                const height =
+                    document.createElement(
+                        "div"
+                    );
+
+                height.className =
+                    "block-height";
+
+                height.textContent =
+                    `#${formatInteger(
+                        block.height
+                    )}`;
+
+                const hash =
+                    document.createElement(
+                        "div"
+                    );
+
+                hash.className =
+                    "block-hash";
+
+                hash.title =
+                    block.hash || "";
+
+                hash.textContent =
+                    shortenHash(
+                        block.hash
+                    );
+
+                const blockTime =
+                    document.createElement(
+                        "div"
+                    );
+
+                blockTime.className =
+                    "block-time";
+
+                blockTime.textContent =
+                    formatDate(
+                        block.time
+                    );
+
+                const transactions =
+                    document.createElement(
+                        "div"
+                    );
+
+                transactions.className =
+                    "block-tx";
+
+                transactions.textContent =
+                    `${formatInteger(
+                        block.tx_count
+                    )} tx`;
+
+                row.append(
+                    height,
+                    hash,
+                    blockTime,
+                    transactions
+                );
+
+                container.appendChild(row);
+            }
+        }
+
+        const status =
+            document.getElementById(
+                "latest-blocks-page-status"
+            );
+
+        const previous =
+            document.getElementById(
+                "latest-blocks-prev"
+            );
+
+        const next =
+            document.getElementById(
+                "latest-blocks-next"
+            );
+
+        const pagination =
+            document.getElementById(
+                "latest-blocks-footer"
+            );
+
+        if (status) {
+            if (totalBlocks === 0) {
+                status.textContent =
+                    "Showing 0 blocks";
+
+            } else {
+                const firstVisible =
+                    start + 1;
+
+                const lastVisible =
+                    Math.min(
+                        start +
+                        LATEST_BLOCKS_PAGE_SIZE,
+                        totalBlocks
+                    );
+
+                status.textContent =
+                    (
+                        `Showing ${firstVisible}–` +
+                        `${lastVisible} of ` +
+                        `${totalBlocks} blocks`
+                    );
+            }
+        }
+
+        if (previous) {
+            previous.disabled =
+                latestBlocksPage <= 1;
+        }
+
+        if (next) {
+            next.disabled =
+                latestBlocksPage >= totalPages;
+        }
+
+        if (pagination) {
+            pagination.hidden =
+                totalPages <= 1;
+        }
+    }
+
+
+    function updateLatestBlocks(blocks) {
+        if (!Array.isArray(blocks)) {
             return;
         }
 
-        for (const block of blocks) {
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-            row.className =
-                "block-card";
-
-
-            const height =
-                document.createElement(
-                    "div"
-                );
-
-            height.className =
-                "block-height";
-
-            height.textContent =
-                `#${formatInteger(
-                    block.height
-                )}`;
-
-
-            const hash =
-                document.createElement(
-                    "div"
-                );
-
-            hash.className =
-                "block-hash";
-
-            hash.title =
-                block.hash || "";
-
-            hash.textContent =
-                shortenHash(
-                    block.hash
-                );
-
-
-            const blockTime =
-                document.createElement(
-                    "div"
-                );
-
-            blockTime.className =
-                "block-time";
-
-            blockTime.textContent =
-                formatDate(
-                    block.time
-                );
-
-
-            const transactions =
-                document.createElement(
-                    "div"
-                );
-
-            transactions.className =
-                "block-tx";
-
-            transactions.textContent =
-                `${formatInteger(
-                    block.tx_count
-                )} tx`;
-
-
-            row.append(
-                height,
-                hash,
-                blockTime,
-                transactions
+        latestBlocks =
+            blocks.slice(
+                0,
+                LATEST_BLOCKS_LIMIT
             );
 
-            container.appendChild(row);
-        }
+        const totalPages =
+            Math.max(
+                1,
+                Math.ceil(
+                    latestBlocks.length /
+                    LATEST_BLOCKS_PAGE_SIZE
+                )
+            );
+
+        latestBlocksPage =
+            Math.min(
+                latestBlocksPage,
+                totalPages
+            );
+
+        renderLatestBlocks();
     }
 
 
@@ -1309,7 +1434,7 @@ function formatMiningDifficulty(value) {
 
     const units = [
         ["T", 1e12],
-        ["B", 1e9],
+        ["G", 1e9],
         ["M", 1e6],
         ["K", 1e3]
     ];
@@ -1351,7 +1476,7 @@ function formatCompactCount(value) {
 
     const units = [
         ["T", 1e12],
-        ["B", 1e9],
+        ["G", 1e9],
         ["M", 1e6],
         ["K", 1e3]
     ];
@@ -1951,6 +2076,21 @@ function setMiningBlocks(newBlocks) {
 
 
 function initializeMiningBlocksTable() {
+    const toggle =
+        document.getElementById(
+            "mining-block-toggle"
+        );
+
+    const content =
+        document.getElementById(
+            "mining-block-content"
+        );
+
+    const toggleLabel =
+        document.getElementById(
+            "mining-block-toggle-label"
+        );
+
     const previousButton =
         document.getElementById(
             "mining-block-prev"
@@ -1960,6 +2100,38 @@ function initializeMiningBlocksTable() {
         document.getElementById(
             "mining-block-next"
         );
+
+    if (
+        toggle &&
+        content &&
+        toggleLabel
+    ) {
+        toggle.addEventListener(
+            "click",
+            () => {
+                const expanded =
+                    toggle.getAttribute(
+                        "aria-expanded"
+                    ) === "true";
+
+                const nextExpanded =
+                    !expanded;
+
+                toggle.setAttribute(
+                    "aria-expanded",
+                    String(nextExpanded)
+                );
+
+                content.hidden =
+                    !nextExpanded;
+
+                toggleLabel.textContent =
+                    nextExpanded
+                        ? "Hide Blocks"
+                        : "View Blocks";
+            }
+        );
+    }
 
     if (previousButton) {
         previousButton.addEventListener(
@@ -2256,6 +2428,158 @@ function renderConnectedMiners(
 }
 
 
+function initializeNodeDetailsPanel() {
+    const toggle =
+        document.getElementById(
+            "node-details-toggle"
+        );
+
+    const content =
+        document.getElementById(
+            "node-details-content"
+        );
+
+    const label =
+        document.getElementById(
+            "node-details-toggle-label"
+        );
+
+    if (!toggle || !content || !label) {
+        return;
+    }
+
+    toggle.addEventListener(
+        "click",
+        () => {
+            const expanded =
+                toggle.getAttribute(
+                    "aria-expanded"
+                ) === "true";
+
+            const nextExpanded =
+                !expanded;
+
+            toggle.setAttribute(
+                "aria-expanded",
+                String(nextExpanded)
+            );
+
+            content.hidden =
+                !nextExpanded;
+
+            label.textContent =
+                nextExpanded
+                    ? "Hide Details"
+                    : "View Details";
+        }
+    );
+}
+
+
+function initializeLatestBlocksPanel() {
+    const toggle =
+        document.getElementById(
+            "latest-blocks-toggle"
+        );
+
+    const content =
+        document.getElementById(
+            "latest-blocks-content"
+        );
+
+    const label =
+        document.getElementById(
+            "latest-blocks-toggle-label"
+        );
+
+    const previous =
+        document.getElementById(
+            "latest-blocks-prev"
+        );
+
+    const next =
+        document.getElementById(
+            "latest-blocks-next"
+        );
+
+    if (
+        !toggle ||
+        !content ||
+        !label ||
+        !previous ||
+        !next
+    ) {
+        return;
+    }
+
+    toggle.addEventListener(
+        "click",
+        () => {
+            const expanded =
+                toggle.getAttribute(
+                    "aria-expanded"
+                ) === "true";
+
+            const nextExpanded =
+                !expanded;
+
+            toggle.setAttribute(
+                "aria-expanded",
+                String(nextExpanded)
+            );
+
+            content.hidden =
+                !nextExpanded;
+
+            label.textContent =
+                nextExpanded
+                    ? "Hide Blocks"
+                    : "View Blocks";
+        }
+    );
+
+    previous.addEventListener(
+        "click",
+        () => {
+            if (latestBlocksPage <= 1) {
+                return;
+            }
+
+            latestBlocksPage -= 1;
+
+            renderLatestBlocks();
+        }
+    );
+
+    next.addEventListener(
+        "click",
+        () => {
+            const totalPages =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        latestBlocks.length /
+                        LATEST_BLOCKS_PAGE_SIZE
+                    )
+                );
+
+            if (
+                latestBlocksPage >=
+                totalPages
+            ) {
+                return;
+            }
+
+            latestBlocksPage += 1;
+
+            renderLatestBlocks();
+        }
+    );
+
+    renderLatestBlocks();
+}
+
+
 function initializeConnectedMinersPanel() {
     const toggle =
         document.getElementById(
@@ -2320,6 +2644,296 @@ function formatNVUAmount(value) {
             }
         )
         + " NVU"
+    );
+}
+
+
+function renderWalletTransactions() {
+    const transactionBody =
+        document.getElementById(
+            "wallet-transaction-body"
+        );
+
+    const pageStatus =
+        document.getElementById(
+            "wallet-transaction-page-status"
+        );
+
+    const previousButton =
+        document.getElementById(
+            "wallet-transaction-prev"
+        );
+
+    const nextButton =
+        document.getElementById(
+            "wallet-transaction-next"
+        );
+
+    const footer =
+        document.getElementById(
+            "wallet-transaction-footer"
+        );
+
+    if (!transactionBody) {
+        return;
+    }
+
+    const totalTransactions =
+        walletTransactions.length;
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                totalTransactions /
+                WALLET_TRANSACTIONS_PAGE_SIZE
+            )
+        );
+
+    walletTransactionsPage =
+        Math.max(
+            1,
+            Math.min(
+                walletTransactionsPage,
+                totalPages
+            )
+        );
+
+    const start =
+        (
+            walletTransactionsPage - 1
+        ) * WALLET_TRANSACTIONS_PAGE_SIZE;
+
+    const visibleTransactions =
+        walletTransactions.slice(
+            start,
+            start +
+            WALLET_TRANSACTIONS_PAGE_SIZE
+        );
+
+    transactionBody.textContent = "";
+
+    if (!visibleTransactions.length) {
+        const row =
+            document.createElement("tr");
+
+        const cell =
+            document.createElement("td");
+
+        cell.colSpan = 4;
+        cell.textContent =
+            "No wallet transactions yet.";
+
+        row.appendChild(cell);
+        transactionBody.appendChild(row);
+
+    } else {
+        for (
+            const transaction
+            of visibleTransactions
+        ) {
+            const row =
+                document.createElement("tr");
+
+            const type =
+                document.createElement("td");
+
+            type.textContent =
+                transaction.category
+                || transaction.label
+                || "Transaction";
+
+            const amount =
+                document.createElement("td");
+
+            const amountNumber =
+                Number(transaction.amount);
+
+            amount.textContent =
+                formatNVUAmount(
+                    transaction.amount
+                );
+
+            if (
+                Number.isFinite(amountNumber)
+                && amountNumber > 0
+            ) {
+                amount.className =
+                    "wallet-amount-positive";
+
+            } else if (
+                Number.isFinite(amountNumber)
+                && amountNumber < 0
+            ) {
+                amount.className =
+                    "wallet-amount-negative";
+            }
+
+            const confirmations =
+                document.createElement("td");
+
+            confirmations.textContent =
+                formatInteger(
+                    transaction.confirmations
+                );
+
+            const when =
+                document.createElement("td");
+
+            when.textContent =
+                formatRelativeTime(
+                    transaction.time
+                    || transaction.timereceived
+                );
+
+            row.appendChild(type);
+            row.appendChild(amount);
+            row.appendChild(confirmations);
+            row.appendChild(when);
+
+            transactionBody.appendChild(row);
+        }
+    }
+
+    if (pageStatus) {
+        if (totalTransactions === 0) {
+            pageStatus.textContent =
+                "Showing 0 transactions";
+
+        } else {
+            const firstVisible =
+                start + 1;
+
+            const lastVisible =
+                Math.min(
+                    start +
+                    WALLET_TRANSACTIONS_PAGE_SIZE,
+                    totalTransactions
+                );
+
+            pageStatus.textContent =
+                (
+                    `Showing ${firstVisible}–` +
+                    `${lastVisible} of ` +
+                    `${totalTransactions} transactions`
+                );
+        }
+    }
+
+    if (previousButton) {
+        previousButton.disabled =
+            walletTransactionsPage <= 1;
+    }
+
+    if (nextButton) {
+        nextButton.disabled =
+            walletTransactionsPage >=
+            totalPages;
+    }
+
+    if (footer) {
+        footer.hidden =
+            totalPages <= 1;
+    }
+}
+
+
+function initializeWalletTransactions() {
+    const toggle =
+        document.getElementById(
+            "wallet-transaction-toggle"
+        );
+
+    const content =
+        document.getElementById(
+            "wallet-transaction-content"
+        );
+
+    const toggleLabel =
+        document.getElementById(
+            "wallet-transaction-toggle-label"
+        );
+
+    const previousButton =
+        document.getElementById(
+            "wallet-transaction-prev"
+        );
+
+    const nextButton =
+        document.getElementById(
+            "wallet-transaction-next"
+        );
+
+    if (
+        !toggle ||
+        !content ||
+        !toggleLabel ||
+        !previousButton ||
+        !nextButton
+    ) {
+        return;
+    }
+
+    toggle.addEventListener(
+        "click",
+        () => {
+            const expanded =
+                toggle.getAttribute(
+                    "aria-expanded"
+                ) === "true";
+
+            const nextExpanded =
+                !expanded;
+
+            toggle.setAttribute(
+                "aria-expanded",
+                String(nextExpanded)
+            );
+
+            content.hidden =
+                !nextExpanded;
+
+            toggleLabel.textContent =
+                nextExpanded
+                    ? "Hide Transactions"
+                    : "View Transactions";
+        }
+    );
+
+    previousButton.addEventListener(
+        "click",
+        () => {
+            if (walletTransactionsPage <= 1) {
+                return;
+            }
+
+            walletTransactionsPage -= 1;
+            renderWalletTransactions();
+        }
+    );
+
+    nextButton.addEventListener(
+        "click",
+        () => {
+            const totalPages =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        walletTransactions.length /
+                        WALLET_TRANSACTIONS_PAGE_SIZE
+                    )
+                );
+
+            if (
+                walletTransactionsPage >=
+                totalPages
+            ) {
+                return;
+            }
+
+            walletTransactionsPage += 1;
+            renderWalletTransactions();
+        }
     );
 }
 
@@ -2476,103 +3090,42 @@ function updateWalletDashboard(
             ? transactionsResult.transactions
             : [];
 
+    walletTransactions =
+        transactions.slice(
+            0,
+            WALLET_TRANSACTIONS_LIMIT
+        );
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                walletTransactions.length /
+                WALLET_TRANSACTIONS_PAGE_SIZE
+            )
+        );
+
+    /*
+     * Preserve the selected page during each
+     * 10-second Dashboard refresh.
+     */
+    walletTransactionsPage =
+        Math.max(
+            1,
+            Math.min(
+                walletTransactionsPage,
+                totalPages
+            )
+        );
+
     setText(
         document.getElementById(
             "wallet-recent-count"
         ),
-        String(transactions.length)
+        String(walletTransactions.length)
     );
 
-    const transactionBody =
-        document.getElementById(
-            "wallet-transaction-body"
-        );
-
-    if (!transactionBody) {
-        return;
-    }
-
-    transactionBody.textContent = "";
-
-    if (!transactions.length) {
-        const row =
-            document.createElement("tr");
-
-        const cell =
-            document.createElement("td");
-
-        cell.colSpan = 4;
-        cell.textContent =
-            "No wallet transactions yet.";
-
-        row.appendChild(cell);
-        transactionBody.appendChild(row);
-
-        return;
-    }
-
-    for (const transaction of transactions) {
-        const row =
-            document.createElement("tr");
-
-        const type =
-            document.createElement("td");
-
-        type.textContent =
-            transaction.category
-            || transaction.label
-            || "Transaction";
-
-        const amount =
-            document.createElement("td");
-
-        const amountNumber =
-            Number(transaction.amount);
-
-        amount.textContent =
-            formatNVUAmount(
-                transaction.amount
-            );
-
-        if (
-            Number.isFinite(amountNumber)
-            && amountNumber > 0
-        ) {
-            amount.className =
-                "wallet-amount-positive";
-
-        } else if (
-            Number.isFinite(amountNumber)
-            && amountNumber < 0
-        ) {
-            amount.className =
-                "wallet-amount-negative";
-        }
-
-        const confirmations =
-            document.createElement("td");
-
-        confirmations.textContent =
-            formatInteger(
-                transaction.confirmations
-            );
-
-        const when =
-            document.createElement("td");
-
-        when.textContent =
-            formatRelativeTime(
-                transaction.time
-                || transaction.timereceived
-            );
-
-        row.appendChild(type);
-        row.appendChild(amount);
-        row.appendChild(confirmations);
-        row.appendChild(when);
-
-        transactionBody.appendChild(row);
-    }
+    renderWalletTransactions();
 }
 
 
@@ -2938,7 +3491,10 @@ async function refreshDashboard() {
     "DOMContentLoaded",
     () => {
         initializeMiningBlocksTable();
+        initializeNodeDetailsPanel();
+        initializeLatestBlocksPanel();
         initializeConnectedMinersPanel();
+        initializeWalletTransactions();
         refreshDashboard();
     }
 );

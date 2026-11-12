@@ -99,7 +99,14 @@ def status():
             "sizeOnDisk": blockchain.get(
                 "size_on_disk"
             ),
-            "version": "1.0.1",
+            "version": str(
+                network.get(
+                    "subversion",
+                    "/NVUN:1.0.0/",
+                )
+            )
+            .removeprefix("/NVUN:")
+            .removesuffix("/"),
             "protocolVersion": network.get(
                 "protocolversion"
             ),
@@ -724,7 +731,7 @@ def search():
 def version():
     return jsonify({
         "ok": True,
-        "dashboardVersion": "1.2.0",
+        "dashboardVersion": "1.2.1",
         "project": "Nouveau-Vision Unit",
         "ticker": "NVU",
     })
